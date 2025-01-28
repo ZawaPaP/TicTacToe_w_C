@@ -8,7 +8,7 @@ CFLAGS := -Wall -Wextra -Werror -I$(INCLUDE)
 
 TARGET := Game
 
-SRCS := src/main.c src/game.c
+SRCS := src/main.c src/game.c src/board.c
 OBJS := $(SRCS:.c=.o)
 
 # 実行ファイルの生成

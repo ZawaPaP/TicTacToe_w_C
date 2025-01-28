@@ -17,13 +17,14 @@ C 言語を実際に書いてみることでコンピュータサイエンスの
    9x9 のマスでの五目並べ
 
 3. 機能要件
-   Display game board
-   Display game status
-   Display player's turn
-   Accept console input
-   Accept game reset / exit
-   Player vs CPU
-   Select the player turn (if vs CPU)
+
+- Display game board
+- Display game status
+- Display player's turn
+- Accept console input
+- Accept game reset / exit
+- Player vs CPU
+- Select the player turn (if vs CPU)
 
 4. 非機能要件
    Python のプロジェクトでできていたことが一通りできること。
