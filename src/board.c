@@ -28,9 +28,8 @@ void printBoard(Board *board) {
 
 void initBoard(Board *board) {
     size_t i, j;
-    for (i = 0; i < sizeof(board->cells) / sizeof(board->cells[0][0]); i++)
-    {
-        for (j = 0; j < sizeof(board->cells[0]) / sizeof(board->cells[0][0]); j++) {
+    for (i = 0; i < BOARD_ROWS; i++) {
+        for (j = 0; j < BOARD_COLUMNS; j++) {
             board->cells[i][j] = EMPTY_CELL;
         }
     }
