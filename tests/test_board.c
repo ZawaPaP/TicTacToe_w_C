@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 #include "../include/board.h"
 #include "test_board.h"
@@ -21,6 +22,74 @@
         board->cells[r][c] = (rand() % 2) ? PLAYER_X : PLAYER_O;
     }
 } */
+
+void testPrintBoard(){
+    printf("Start testPrintBoard...\n");
+
+    Board board;
+
+    initBoard(&board);
+
+    board.cells[0][0] = PLAYER_X;
+    board.cells[4][6] = PLAYER_O;
+    board.cells[8][8] = PLAYER_X;
+
+    freopen("test_print_board_output.txt", "w", stdout);
+    printBoard(&board);
+    freopen("/dev/tty", "w", stdout);
+
+    FILE* fp = fopen("test_print_board_output.txt", "r");
+    if (!fp) {
+        printf("Failed to open test_print_board_output.txt\n");
+        return;
+    }
+
+    const char *expected[] = {
+        "    1   2   3   4   5   6   7   8   9   \n",
+        "\n",
+        "1   X |   |   |   |   |   |   |   |  \n",
+        "    - + - + - + - + - + - + - + - + - \n",
+        "2     |   |   |   |   |   |   |   |  \n",
+        "    - + - + - + - + - + - + - + - + - \n",
+        "3     |   |   |   |   |   |   |   |  \n",
+        "    - + - + - + - + - + - + - + - + - \n",
+        "4     |   |   |   |   |   |   |   |  \n",
+        "    - + - + - + - + - + - + - + - + - \n",
+        "5     |   |   |   |   |   | O |   |  \n",
+        "    - + - + - + - + - + - + - + - + - \n",
+        "6     |   |   |   |   |   |   |   |  \n",
+        "    - + - + - + - + - + - + - + - + - \n",
+        "7     |   |   |   |   |   |   |   |  \n",
+        "    - + - + - + - + - + - + - + - + - \n",
+        "8     |   |   |   |   |   |   |   |  \n",
+        "    - + - + - + - + - + - + - + - + - \n",
+        "9     |   |   |   |   |   |   |   | X\n",
+        "\n", 
+        NULL
+        };
+
+    char buffer[100];
+    int line = 0;
+    int pass = 1;
+
+    while(fgets(buffer, sizeof(buffer), fp) != NULL) {
+
+        if (expected[line] == NULL) break;
+
+        if (strcmp(buffer, expected[line]) != 0) {
+            printf("Error: Mismatch on line %d:\nExpected: \"%s\"\nGot:      \"%s\"\n", line + 1, expected[line], buffer);
+            pass = 0;
+        }
+        line++;
+    }
+    fclose(fp);
+    if (pass) {
+        printf("test testPrintBoard success.\n");
+    } else {
+        printf("test Failed.\n");
+    }
+    remove("test_print_board_output.txt");
+}
 
 void testInitBoard()
 {
@@ -47,6 +116,7 @@ void testInitBoard()
 
 void runBoardTests() {
     printf("Start runBoardTests...\n");
+    testPrintBoard();
     testInitBoard();
     printf("Finished runBoardTests.\n");
 }
