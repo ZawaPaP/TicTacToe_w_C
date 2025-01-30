@@ -120,5 +120,3 @@ void runBoardTests() {
     testInitBoard();
     printf("Finished runBoardTests.\n");
 }
-
-

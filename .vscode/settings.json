@@ -3,6 +3,8 @@
     "board.h": "c",
     "assert.h": "c",
     "test_board.h": "c",
-    "stdio.h": "c"
+    "stdio.h": "c",
+    "plays.h": "c",
+    "stdlib.h": "c"
   }
 }

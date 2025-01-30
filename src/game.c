@@ -15,5 +15,4 @@ void printGameStatus(int i, int j) {
 }
 
 void printGameResult() {
-
 }

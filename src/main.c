@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "game.h"
 #include "board.h"
+#include "plays.h"
 
 int main() {
     startGame();
@@ -9,10 +10,11 @@ int main() {
     Board *board = (Board *)malloc(sizeof(Board));
     initBoard(board);
 
-    int i = 3;
-    int j = 1;
     printBoard(board);
-    printGameStatus(i, j);
+    //printGameStatus(i, j);
+
+    int x, y;
+    getInput(&x, &y);
     free(board);
     return 0;
 }
