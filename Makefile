@@ -8,7 +8,7 @@ CFLAGS := -Wall -Wextra -Werror -I$(INCLUDE)
 
 TARGET := Game
 
-COMMON_SRCS := src/board.c src/game.c src/plays.c
+COMMON_SRCS := src/board.c src/game.c src/plays.c src/queue.c
 SRCS := src/main.c $(COMMON_SRCS)
 OBJS := $(SRCS:.c=.o)
 
