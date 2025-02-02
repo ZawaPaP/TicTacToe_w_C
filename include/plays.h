@@ -7,5 +7,6 @@ typedef struct {
 } Hand;
 
 int getInput();
+int validateInput();
 
 #endif

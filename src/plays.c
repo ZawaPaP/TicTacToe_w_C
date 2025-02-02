@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include "plays.h"
+#include "board.h"
+
 
 int getInput(int *x, int *y){
     char str[8];
@@ -18,4 +20,17 @@ int getInput(int *x, int *y){
         return 1;
     }
     return 0;
+}
+
+int validateInput(int *row, int *col, Board* board) {
+    if (*row < 1 || BOARD_ROWS < *row || *col < 1 || BOARD_COLUMNS < *col) {
+        return 0;
+    }
+
+    // 入力は 1 ~ BoardRow, 1 ~ BoardColumn だが、データは 0 ~ BoardRow - 1, 0 ~ BoardCol
+
+    if (board->cells[*row][*col] != EMPTY_CELL) {
+        return 0;
+    }
+    return 1;
 }
