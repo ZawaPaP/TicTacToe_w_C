@@ -1,1 +1,18 @@
 .DS_Store
+# コンパイル生成物
+*.o
+*.out
+*.exe
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
+*.exp
+*.def
+*.manifest
+*.res
+*.rc
+*.ico
+
+vscode/

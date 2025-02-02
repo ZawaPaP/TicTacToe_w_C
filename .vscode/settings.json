@@ -8,6 +8,7 @@
     "stdlib.h": "c",
     "game.h": "c",
     "test_game.h": "c",
-    "string.h": "c"
+    "string.h": "c",
+    "test_queue.h": "c"
   }
 }

@@ -9,9 +9,11 @@ typedef struct {
 } Position;
 
 typedef struct {
-    Position positions[QUEUE_SIZE];
+    Position *positions;
     int head;
     int tail;
+    int size;
+    int capacity;
 } Queue;
 
 void initQueue(Queue *q);
@@ -19,5 +21,6 @@ int isEmpty(Queue *q);
 int isFull(Queue *q);
 void push(Queue *q, Position p);
 Position pop(Queue *q);
+void freeQueue(Queue *q);
 
 #endif
