@@ -1,18 +1,34 @@
 #include <stdio.h>
+#include "plays.h"
+#include "board.h"
 
-void startGame() {
+void printGameStatus(int turnCounts, char player);
+
+void playGame() {    
+    Board board;
+    initBoard(&board);
+    int row, col;
+    char currentPlayer = PLAYER_X;
+    int turnCounts = 0;
+
     printf("\n        TicTacToe Game Started!\n\n");
+
+    while(1) {
+        turnCounts += 1;
+        printBoard(&board);
+        printGameStatus(turnCounts, currentPlayer);
+        while (1)
+        {
+            if(getInput(&row, &col)) {
+                if (placeMove(row, col, &board, currentPlayer)) {
+                    break;
+                }
+            }
+        }
+        currentPlayer = (currentPlayer == PLAYER_X) ? PLAYER_O : PLAYER_X;
+    }
 }
 
-void printGameStatus(int i, int j) {
-    char str[8];
-
-    printf("Turn %d\n", i);
-    printf("Player %d, please input your hand: ", j);
-    
-    fgets(str, sizeof(str), stdin);
-    puts(str);
-}
-
-void printGameResult() {
+void printGameStatus(int turnCounts, char player) {
+    printf("Turn %d, %c's tarn.\n",turnCounts, player);    
 }

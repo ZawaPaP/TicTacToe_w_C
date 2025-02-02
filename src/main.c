@@ -5,16 +5,6 @@
 #include "plays.h"
 
 int main() {
-    startGame();
-
-    Board *board = (Board *)malloc(sizeof(Board));
-    initBoard(board);
-
-    printBoard(board);
-    //printGameStatus(i, j);
-
-    int x, y;
-    getInput(&x, &y);
-    free(board);
+    playGame();
     return 0;
 }

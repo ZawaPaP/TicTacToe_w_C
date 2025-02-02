@@ -19,10 +19,12 @@ int getInput(int *x, int *y){
     printf("Please input your hand as row, col: ");
     
     if (fgets(str, sizeof(str), stdin) == NULL) {
+        printf("Error: invalid input. Try again.\n");
         return 0;
     }
     // sscanfは変換されたフィールドの数を返す
     if (sscanf(str, " %d , %d ", x, y) != 2 && sscanf(str, " %d %d ", x, y) != 2) {
+        printf("Error: invalid input. Try again.\n");
         return 0;
     }
 
