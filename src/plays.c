@@ -4,6 +4,15 @@
 
 int validateInput(int row, int col, Board *board);
 
+
+int placeMove(int row, int col, Board* board, char player) {
+    if (!validateInput(row, col, board)) {
+        return 0;
+    }
+    board->cells[row][col] = player;
+    return 1;
+}
+
 int getInput(int *x, int *y){
     char str[8];
 
