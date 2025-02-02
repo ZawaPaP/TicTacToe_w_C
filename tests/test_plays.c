@@ -55,20 +55,13 @@ void testGetInputExpectedStr()
     char input[] = "1, 2\n";
     // 標準入出力のバックアップ
     FILE* stdin_backup = stdin; 
-    FILE* stdout_backup = stdout; 
-    freopen("/dev/null", "w", stdout);
 
-    FILE* input_stream = fmemopen(input, sizeof(input), "r");
-    stdin = input_stream;
+    stdin = fmemopen(input, sizeof(input), "r");
     assert(getInput(&x, &y) == 1);
     assert(x == 1 && y == 2);
 
     // 標準入力を元に戻す
     stdin = stdin_backup;
-    stdout = stdout_backup;
-    fclose(input_stream);
-    fclose(stdin_backup);
-    fclose(stdout_backup);
 }
 
 void testGetInputWithoutComma()
@@ -79,8 +72,6 @@ void testGetInputWithoutComma()
 
     // 標準入出力のバックアップ
     FILE* stdin_backup = stdin; 
-    FILE* stdout_backup = stdout; 
-    freopen("/dev/null", "w", stdout);
     
     stdin = fmemopen(input, sizeof(input), "r");
 
@@ -89,9 +80,6 @@ void testGetInputWithoutComma()
 
     // 標準入力を元に戻す
     stdin = stdin_backup;
-    stdout = stdout_backup;
-    fclose(stdin_backup);
-    fclose(stdout_backup);
 }
 
 void testGetInputWithSpace()
@@ -102,8 +90,6 @@ void testGetInputWithSpace()
 
     // 標準入出力のバックアップ
     FILE* stdin_backup = stdin; 
-    FILE* stdout_backup = stdout; 
-    freopen("/dev/null", "w", stdout);
     
     stdin = fmemopen(input, sizeof(input), "r");
 
@@ -112,9 +98,6 @@ void testGetInputWithSpace()
 
     // 標準入力を元に戻す
     stdin = stdin_backup;
-    stdout = stdout_backup;
-    fclose(stdin_backup);
-    fclose(stdout_backup);
 }
 
 void testGetInputWithoutSpace()
@@ -125,8 +108,6 @@ void testGetInputWithoutSpace()
 
     // 標準入出力のバックアップ
     FILE* stdin_backup = stdin; 
-    FILE* stdout_backup = stdout; 
-    freopen("/dev/null", "w", stdout);
     
     stdin = fmemopen(input, sizeof(input), "r");
 
@@ -135,9 +116,6 @@ void testGetInputWithoutSpace()
 
     // 標準入力を元に戻す
     stdin = stdin_backup;
-    stdout = stdout_backup;
-    fclose(stdin_backup);
-    fclose(stdout_backup);
 }
 
 void testGetInputFailedWithAlphabet()
@@ -148,8 +126,6 @@ void testGetInputFailedWithAlphabet()
 
     // 標準入出力のバックアップ
     FILE* stdin_backup = stdin; 
-    FILE* stdout_backup = stdout; 
-    freopen("/dev/null", "w", stdout);
     
     stdin = fmemopen(input, sizeof(input), "r");
 
@@ -158,10 +134,6 @@ void testGetInputFailedWithAlphabet()
 
     // 標準入力を元に戻す
     stdin = stdin_backup;
-    stdout = stdout_backup;
-    fclose(stdin_backup);
-    fclose(stdout_backup);
-
 }
 
 void testGetInputFailedFloat()
@@ -172,8 +144,6 @@ void testGetInputFailedFloat()
 
     // 標準入出力のバックアップ
     FILE* stdin_backup = stdin; 
-    FILE* stdout_backup = stdout; 
-    freopen("/dev/null", "w", stdout);
     
     stdin = fmemopen(input, sizeof(input), "r");
 
@@ -181,10 +151,6 @@ void testGetInputFailedFloat()
 
     // 標準入力を元に戻す
     stdin = stdin_backup;
-    stdout = stdout_backup;
-    fclose(stdin_backup);
-    fclose(stdout_backup);
-
 }
 
 void testGetInputFailedEmpty()
@@ -195,8 +161,6 @@ void testGetInputFailedEmpty()
 
     // 標準入出力のバックアップ
     FILE* stdin_backup = stdin; 
-    FILE* stdout_backup = stdout; 
-    freopen("/dev/null", "w", stdout);
     
     stdin = fmemopen(input, sizeof(input), "r");
 
@@ -204,9 +168,6 @@ void testGetInputFailedEmpty()
 
     // 標準入力を元に戻す
     stdin = stdin_backup;
-    stdout = stdout_backup;
-    fclose(stdin_backup);
-    fclose(stdout_backup);
 }
 
 void testGetInputFailedEOF()
@@ -216,19 +177,13 @@ void testGetInputFailedEOF()
     char input[] = "EOF";
 
     // 標準入出力のバックアップ
-    FILE* stdin_backup = stdin; 
-    FILE* stdout_backup = stdout; 
-    freopen("/dev/null", "w", stdout);
-    
+    FILE* stdin_backup = stdin;     
     stdin = fmemopen(input, sizeof(input), "r");
 
     assert(getInput(&x, &y) == 0); 
 
     // 標準入力を元に戻す
     stdin = stdin_backup;
-    stdout = stdout_backup;
-    fclose(stdin_backup);
-    fclose(stdout_backup);
 }
 
 void testGetInputFailedTooLongInt()
@@ -239,8 +194,6 @@ void testGetInputFailedTooLongInt()
 
     // 標準入出力のバックアップ
     FILE* stdin_backup = stdin; 
-    FILE* stdout_backup = stdout; 
-    freopen("/dev/null", "w", stdout);
     
     stdin = fmemopen(input, sizeof(input), "r");
 
@@ -248,9 +201,6 @@ void testGetInputFailedTooLongInt()
 
     // 標準入力を元に戻す
     stdin = stdin_backup;
-    stdout = stdout_backup;
-    fclose(stdin_backup);
-    fclose(stdout_backup);
 }
 
 void testValidateInputExpectedRange() {
