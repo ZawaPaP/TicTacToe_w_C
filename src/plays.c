@@ -2,6 +2,7 @@
 #include "plays.h"
 #include "board.h"
 
+int validateInput(int row, int col, Board *board);
 
 int getInput(int *x, int *y){
     char str[8];
@@ -16,18 +17,17 @@ int getInput(int *x, int *y){
         return 0;
     }
 
-    if (1 <= *x && *x <= 9 && 1 <= *y && *y <= 9) {
-        return 1;
-    }
-    return 0;
+    return 1;
 }
 
 int validateInput(int row, int col, Board* board) {
     if (row < 1 || BOARD_ROWS < row || col < 1 || BOARD_COLUMNS < col) {
+        printf("Error: Row and Column must be between 1 and %d.\n", BOARD_ROWS);
         return 0;
     }
 
     if (board->cells[row][col] != EMPTY_CELL) {
+        printf("Error: The %d, %d is already marked.\n", row, col);
         return 0;
     }
     return 1;

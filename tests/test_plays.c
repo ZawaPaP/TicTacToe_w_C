@@ -123,57 +123,11 @@ void testGetInputFailedWithAlphabet()
 
 }
 
-void testGetInputFailedTooManyNumerics()
-{
-    //"10 10 10\n"
-    int x = 0, y = 0;
-    printf("%d,%d\n", x, y);
-    char input[] = "10 10 10\n";
-
-    // 標準入出力のバックアップ
-    FILE* stdin_backup = stdin; 
-    FILE* stdout_backup = stdout; 
-    freopen("/dev/null", "w", stdout);
-    
-    stdin = fmemopen(input, sizeof(input), "r");
-
-    assert(getInput(&x, &y) == 0);
-
-    // 標準入力を元に戻す
-    stdin = stdin_backup;
-    stdout = stdout_backup; 
-    fclose(stdin_backup);
-    fclose(stdout_backup);
-}
-
 void testGetInputFailedFloat()
 {
     //"3.5 2\n"
     int x = 0, y = 0;
     char input[] = "3.5 2\n";
-
-    // 標準入出力のバックアップ
-    FILE* stdin_backup = stdin; 
-    FILE* stdout_backup = stdout; 
-    freopen("/dev/null", "w", stdout);
-    
-    stdin = fmemopen(input, sizeof(input), "r");
-
-    assert(getInput(&x, &y) == 0); 
-
-    // 標準入力を元に戻す
-    stdin = stdin_backup;
-    stdout = stdout_backup;
-    fclose(stdin_backup);
-    fclose(stdout_backup);
-
-}
-
-void testGetInputFailedOutOfRange()
-{
-    //"-1 2\n"
-    int x = 0, y = 0;
-    char input[] = "-1 2\n";
 
     // 標準入出力のバックアップ
     FILE* stdin_backup = stdin; 
@@ -327,9 +281,7 @@ void runPlaysTests() {
     testGetInputWithSpace();
     testGetInputWithoutSpace();
     testGetInputFailedWithAlphabet();
-    testGetInputFailedTooManyNumerics();
     testGetInputFailedFloat();
-    testGetInputFailedOutOfRange();
     testGetInputFailedEmpty();
     testGetInputFailedEOF();
     testGetInputFailedTooLongInt();
