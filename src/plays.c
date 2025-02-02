@@ -22,14 +22,12 @@ int getInput(int *x, int *y){
     return 0;
 }
 
-int validateInput(int *row, int *col, Board* board) {
-    if (*row < 1 || BOARD_ROWS < *row || *col < 1 || BOARD_COLUMNS < *col) {
+int validateInput(int row, int col, Board* board) {
+    if (row < 1 || BOARD_ROWS < row || col < 1 || BOARD_COLUMNS < col) {
         return 0;
     }
 
-    // 入力は 1 ~ BoardRow, 1 ~ BoardColumn だが、データは 0 ~ BoardRow - 1, 0 ~ BoardCol
-
-    if (board->cells[*row][*col] != EMPTY_CELL) {
+    if (board->cells[row][col] != EMPTY_CELL) {
         return 0;
     }
     return 1;

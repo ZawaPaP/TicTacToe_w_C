@@ -9,7 +9,7 @@
 #define PLAYER_O 'O'
 
 typedef struct {
-    char cells[BOARD_ROWS][BOARD_COLUMNS];
+    char cells[BOARD_ROWS + 1][BOARD_COLUMNS + 1];
 } Board;
 
 

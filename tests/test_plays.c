@@ -32,8 +32,6 @@ void testGetInputExpectedStr()
 
 void testGetInputWithoutComma()
 {
-    printf("test2");
-
     //"1 2\n" → 1, 2
     int x = 0, y = 0;
     char input[] = "1 2\n";
@@ -288,8 +286,10 @@ void testValidateInputFailedOutOfRange()
  {
     Board board = _prepareBoard();
 
-    int zero = 0;
-    assert(validateInput(zero, zero, &board) == 0);
+    int zeroRow = 0;
+    int zeroCol = 0;
+
+    assert(validateInput(zeroRow, zeroCol, &board) == 0);
     
     int negativeInt = -1;
     int randInt = 4;
@@ -306,7 +306,17 @@ void testValidateInputFailedOutOfRange()
      int col = 5;
 
      board.cells[row][col] = PLAYER_O;
-    assert(validateInput(row + 1, col + 1, &board) == 0);
+    assert(validateInput(row, col, &board) == 0);
+
+    int rowEdgeBegin = 1;
+    int colEdgeBegin = 1;
+    board.cells[rowEdgeBegin][colEdgeBegin] = PLAYER_O;
+    assert(validateInput(rowEdgeBegin, colEdgeBegin, &board) == 0);
+
+    int rowEdgeEnd = BOARD_ROWS;
+    int colEdgeEnd = BOARD_COLUMNS;
+    board.cells[rowEdgeEnd][colEdgeEnd] = PLAYER_O;
+    assert(validateInput(rowEdgeEnd, colEdgeEnd, &board) == 0);
  }
 
 void runPlaysTests() {

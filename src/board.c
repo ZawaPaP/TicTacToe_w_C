@@ -4,21 +4,21 @@
 void printBoard(Board *board) {
     int i, j, k;
     printf("    ");
-    for (k = 0; k < BOARD_COLUMNS; k++) {
-        printf("%d   ", k + 1);
+    for (k = 1; k <= BOARD_COLUMNS; k++) {
+        printf("%d   ", k);
     }
     printf("\n\n");
 
-    for (i = 0; i < BOARD_ROWS; i++)
+    for (i = 1; i <= BOARD_ROWS; i++)
     {
-        printf("%d   ", i + 1);
-        for (j = 0; j < BOARD_COLUMNS - 1; j++)
+        printf("%d   ", i);
+        for (j = 1; j < BOARD_COLUMNS; j++)
         {
             printf("%c | ", board->cells[i][j]);
         }
-        printf("%c\n", board->cells[i][BOARD_COLUMNS - 1]);
+        printf("%c\n", board->cells[i][BOARD_COLUMNS]);
 
-        if (i < BOARD_ROWS - 1)
+        if (i < BOARD_ROWS)
         {
             printf("    - + - + - + - + - + - + - + - + - \n");
         }
@@ -28,8 +28,8 @@ void printBoard(Board *board) {
 
 void initBoard(Board *board) {
     size_t i, j;
-    for (i = 0; i < BOARD_ROWS; i++) {
-        for (j = 0; j < BOARD_COLUMNS; j++) {
+    for (i = 1; i <= BOARD_ROWS; i++) {
+        for (j = 1; j <= BOARD_COLUMNS; j++) {
             board->cells[i][j] = EMPTY_CELL;
         }
     }

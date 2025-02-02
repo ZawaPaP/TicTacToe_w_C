@@ -30,9 +30,9 @@ void testPrintBoard(){
 
     initBoard(&board);
 
-    board.cells[0][0] = PLAYER_X;
-    board.cells[4][6] = PLAYER_O;
-    board.cells[8][8] = PLAYER_X;
+    board.cells[1][1] = PLAYER_X;
+    board.cells[5][7] = PLAYER_O;
+    board.cells[9][9] = PLAYER_X;
 
     freopen("test_print_board_output.txt", "w", stdout);
     printBoard(&board);
@@ -97,14 +97,14 @@ void testInitBoard()
 
     Board board;
 
-    board.cells[0][0] = PLAYER_X;
+    board.cells[1][1] = PLAYER_X;
     board.cells[4][6] = PLAYER_O;
     board.cells[8][8] = PLAYER_X;
     
     initBoard(&board);
 
-    for (int i = 0; i < BOARD_ROWS; i++) {
-        for (int j = 0; j < BOARD_COLUMNS; j++) {
+    for (int i = 1; i <= BOARD_ROWS; i++) {
+        for (int j = 1; j <= BOARD_COLUMNS; j++) {
             if (board.cells[i][j] != EMPTY_CELL) {
                 printf("Error: %d, %d is not empty.\n", i, j);
                 assert(board.cells[i][j] == EMPTY_CELL);
