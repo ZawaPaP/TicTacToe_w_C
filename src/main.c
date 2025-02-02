@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "game.h"
 #include "board.h"
 #include "plays.h"
+#include "game.h"
+
 
 int main() {
     playGame();

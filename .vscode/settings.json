@@ -5,6 +5,10 @@
     "test_board.h": "c",
     "stdio.h": "c",
     "plays.h": "c",
-    "stdlib.h": "c"
+    "stdlib.h": "c",
+    "game.h": "c",
+    "test_game.h": "c",
+    "string.h": "c",
+    "test_queue.h": "c"
   }
 }
