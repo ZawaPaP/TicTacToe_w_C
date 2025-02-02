@@ -336,6 +336,7 @@ void runPlaysTests() {
     printf("Finished getInputTests...\n");
     printf("Start validateInputTests...\n");
     testValidateInputExpectedRange();
+    testValidateInputFailedOutOfRange();
     testValidateInputFailedNotEmpty();
     printf("Finished validateInputTests...\n");
     printf("Finished runPlaysTests.\n");
