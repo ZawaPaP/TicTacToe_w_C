@@ -1,7 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-void startGame();
-void printGameStatus(int turn, int player);
+void playGame();
+void printGameStatus(int turnCounts, char player);
 
 #endif
