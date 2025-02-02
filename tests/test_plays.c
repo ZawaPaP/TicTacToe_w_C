@@ -7,6 +7,47 @@
 #include "test_plays.h"
 
 
+Board _prepareBoard() {
+    Board board;
+    initBoard(&board);
+    return board;
+}
+
+
+void testPlaceMoveExpected(){
+
+    Board board = _prepareBoard();
+    assert(placeMove(5, 5, &board, PLAYER_X) == 1);
+    assert(board.cells[5][5] == PLAYER_X);  
+
+    // ４隅のエッジケースについてテスト
+    assert(placeMove(1, 1, &board, PLAYER_X) == 1);
+    assert(board.cells[1][1] == PLAYER_X);  
+    
+    assert(placeMove(BOARD_ROWS, 1, &board, PLAYER_X) == 1);
+    assert(board.cells[BOARD_ROWS][1] == PLAYER_X);  
+
+    assert(placeMove(1, BOARD_COLUMNS, &board, PLAYER_O) == 1);
+    assert(board.cells[1][BOARD_COLUMNS] == PLAYER_O);  
+
+    assert(placeMove(BOARD_ROWS, BOARD_COLUMNS, &board, PLAYER_O) == 1);
+    assert(board.cells[BOARD_ROWS][BOARD_COLUMNS] == PLAYER_O);  
+}
+
+
+void testPlaceMoveFailedAlreadyMarked() {
+    Board board = _prepareBoard();
+    board.cells[5][5] = PLAYER_X;
+
+    assert(placeMove(5, 5, &board, PLAYER_O) == 0);
+    assert(board.cells[5][5] == PLAYER_X);
+}
+
+void testPlaceMoveFailedOutOfRange() {
+    Board board = _prepareBoard();
+    assert(placeMove(BOARD_ROWS + 1, BOARD_COLUMNS, &board, PLAYER_O) == 0);
+}
+
 void testGetInputExpectedStr()
 {
     //"1, 2\n" →1, 2
@@ -212,13 +253,6 @@ void testGetInputFailedTooLongInt()
     fclose(stdout_backup);
 }
 
-
-Board _prepareBoard() {
-    Board board;
-    initBoard(&board);
-    return board;
-}
-
 void testValidateInputExpectedRange() {
     Board board = _prepareBoard();
 
@@ -275,6 +309,10 @@ void testValidateInputFailedOutOfRange()
 
 void runPlaysTests() {
     printf("Start runPlaysTests...\n");
+    printf("Start placeMoveTests...\n");
+    testPlaceMoveExpected();
+    testPlaceMoveFailedAlreadyMarked();
+    printf("Finished placeMoveTests...\n");
     printf("Start getInputTests...\n");
     testGetInputExpectedStr();
     testGetInputWithoutComma();
