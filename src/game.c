@@ -32,3 +32,8 @@ void playGame() {
 void printGameStatus(int turnCounts, char player) {
     printf("Turn %d, %c's tarn.\n",turnCounts, player);    
 }
+
+int hasWinner(Board *board) {
+    printf("hasWinner! %d\n", board->cells[1][1]);
+    return 1;
+}

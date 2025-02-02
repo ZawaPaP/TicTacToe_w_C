@@ -24,7 +24,7 @@ clean:
 
 
 TEST_TARGET := tests/test
-TEST_SRCS := tests/test_main.c tests/test_board.c tests/test_plays.c
+TEST_SRCS := tests/test_main.c tests/test_board.c tests/test_plays.c tests/test_game.c
 TEST_OBJS := $(TEST_SRCS:.c=.o) $(COMMON_SRCS:.c=.o)
 
 $(TEST_TARGET): $(TEST_OBJS)

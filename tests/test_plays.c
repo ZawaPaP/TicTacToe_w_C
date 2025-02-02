@@ -4,19 +4,18 @@
 #include <assert.h>
 #include "../include/plays.h"
 #include "../include/board.h"
+//#include "test_base.h"
 #include "test_plays.h"
 
-
-Board _prepareBoard() {
+Board __prepareBoard() {
     Board board;
     initBoard(&board);
     return board;
 }
 
-
 void testPlaceMoveExpected(){
 
-    Board board = _prepareBoard();
+    Board board = __prepareBoard();
     assert(placeMove(5, 5, &board, PLAYER_X) == 1);
     assert(board.cells[5][5] == PLAYER_X);  
 
@@ -36,7 +35,7 @@ void testPlaceMoveExpected(){
 
 
 void testPlaceMoveFailedAlreadyMarked() {
-    Board board = _prepareBoard();
+    Board board = __prepareBoard();
     board.cells[5][5] = PLAYER_X;
 
     assert(placeMove(5, 5, &board, PLAYER_O) == 0);
@@ -44,7 +43,7 @@ void testPlaceMoveFailedAlreadyMarked() {
 }
 
 void testPlaceMoveFailedOutOfRange() {
-    Board board = _prepareBoard();
+    Board board = __prepareBoard();
     assert(placeMove(BOARD_ROWS + 1, BOARD_COLUMNS, &board, PLAYER_O) == 0);
 }
 
@@ -204,7 +203,9 @@ void testGetInputFailedTooLongInt()
 }
 
 void testValidateInputExpectedRange() {
-    Board board = _prepareBoard();
+    printf("000000");
+
+    Board board = __prepareBoard();
 
     int row = 5;
     int col = 5;
@@ -222,7 +223,9 @@ void testValidateInputExpectedRange() {
 
 void testValidateInputFailedOutOfRange()
  {
-    Board board = _prepareBoard();
+    printf("000000");
+
+    Board board = __prepareBoard();
 
     int zeroRow = 0;
     int zeroCol = 0;
@@ -238,7 +241,7 @@ void testValidateInputFailedOutOfRange()
  }
 
  void testValidateInputFailedNotEmpty() {
-     Board board = _prepareBoard();
+     Board board = __prepareBoard();
 
      int row = 5;
      int col = 5;
