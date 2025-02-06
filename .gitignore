@@ -1,5 +1,6 @@
 .DS_Store
 # コンパイル生成物
+build/
 *.o
 *.out
 *.exe
