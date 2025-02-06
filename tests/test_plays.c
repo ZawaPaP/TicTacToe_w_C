@@ -3,15 +3,10 @@
 #include <string.h>
 #include <assert.h>
 #include "../include/plays.h"
-#include "../include/board.h"
-//#include "test_base.h"
+#include "test_utils.h"
 #include "test_plays.h"
 
-Board __prepareBoard() {
-    Board board;
-    initBoard(&board);
-    return board;
-}
+
 
 void testPlaceMoveExpected(){
 
