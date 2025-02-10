@@ -12,14 +12,12 @@ void initQueue(Queue *q) {
         exit(1);
 }
 
-int isEmpty(Queue *q){
-    return q->size == 0;
+BOOL isEmpty(Queue *q){
+    return (q->size == 0) ? TRUE : FALSE;
 }
 
-int isFull(Queue *q){
-    if (q->size == q->capacity)
-        return 1;
-    return 0;
+BOOL isFull(Queue *q){
+    return (q->size == q->capacity) ? TRUE : FALSE;
 }
 
 void extendQueue(Queue *q) {

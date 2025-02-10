@@ -19,8 +19,8 @@ void testHasWinnerInVerticalExpected()
     board_1.cells[4][1] = PLAYER_X;
     board_1.cells[5][1] = PLAYER_X;
 
-    assert(hasWinner(&board_1, PLAYER_X) == 1);
-    assert(hasWinner(&board_1, PLAYER_O) == 0);
+    assert(hasWinner(&board_1, PLAYER_X) == TRUE);
+    assert(hasWinner(&board_1, PLAYER_O) == FALSE);
 
     Board board_2 = __prepareBoard();
 
@@ -30,8 +30,8 @@ void testHasWinnerInVerticalExpected()
     board_2.cells[7][7] = PLAYER_O;
     board_2.cells[8][7] = PLAYER_O;
 
-    assert(hasWinner(&board_2, PLAYER_O) == 1);
-    assert(hasWinner(&board_2, PLAYER_X) == 0);
+    assert(hasWinner(&board_2, PLAYER_O) == TRUE);
+    assert(hasWinner(&board_2, PLAYER_X) == FALSE);
 
  }
 
@@ -44,8 +44,8 @@ void testHasWinnerInHorizontalExpected() {
     board_1.cells[1][4] = PLAYER_X;
     board_1.cells[1][5] = PLAYER_X;
 
-    assert(hasWinner(&board_1, PLAYER_X) == 1);
-    assert(hasWinner(&board_1, PLAYER_O) == 0);
+    assert(hasWinner(&board_1, PLAYER_X) == TRUE);
+    assert(hasWinner(&board_1, PLAYER_O) == FALSE);
 
     Board board_2 = __prepareBoard();
 
@@ -55,8 +55,8 @@ void testHasWinnerInHorizontalExpected() {
     board_2.cells[8][8] = PLAYER_O;
     board_2.cells[8][9] = PLAYER_O;
 
-    assert(hasWinner(&board_2, PLAYER_O) == 1);
-    assert(hasWinner(&board_2, PLAYER_X) == 0);
+    assert(hasWinner(&board_2, PLAYER_O) == TRUE);
+    assert(hasWinner(&board_2, PLAYER_X) == FALSE);
 
 }
 
@@ -68,8 +68,8 @@ void testHasWinnerInCrossExpected() {
     board.cells[4][4] = PLAYER_X;
     board.cells[5][5] = PLAYER_X;
 
-    assert(hasWinner(&board, PLAYER_X) == 1);
-    assert(hasWinner(&board, PLAYER_O) == 0);
+    assert(hasWinner(&board, PLAYER_X) == TRUE);
+    assert(hasWinner(&board, PLAYER_O) == FALSE);
 }
 
 void testNotHasWinnerExpected() {
@@ -87,8 +87,8 @@ void testNotHasWinnerExpected() {
     board.cells[8][8] = PLAYER_X;
     
 
-    assert(hasWinner(&board, PLAYER_X) == 0);
-    assert(hasWinner(&board, PLAYER_O) == 0);
+    assert(hasWinner(&board, PLAYER_X) == FALSE);
+    assert(hasWinner(&board, PLAYER_O) == FALSE);
 
 }
 

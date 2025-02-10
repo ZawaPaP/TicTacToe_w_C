@@ -11,20 +11,20 @@
 void testPlaceMoveExpected(){
 
     Board board = __prepareBoard();
-    assert(placeMove(5, 5, &board, PLAYER_X) == 1);
+    assert(canApplyMove(5, 5, &board, PLAYER_X) == TRUE);
     assert(board.cells[5][5] == PLAYER_X);  
 
     // ４隅のエッジケースについてテスト
-    assert(placeMove(1, 1, &board, PLAYER_X) == 1);
+    assert(canApplyMove(1, 1, &board, PLAYER_X) == TRUE);
     assert(board.cells[1][1] == PLAYER_X);  
     
-    assert(placeMove(BOARD_ROWS, 1, &board, PLAYER_X) == 1);
+    assert(canApplyMove(BOARD_ROWS, 1, &board, PLAYER_X) == TRUE);
     assert(board.cells[BOARD_ROWS][1] == PLAYER_X);  
 
-    assert(placeMove(1, BOARD_COLUMNS, &board, PLAYER_O) == 1);
+    assert(canApplyMove(1, BOARD_COLUMNS, &board, PLAYER_O) == TRUE);
     assert(board.cells[1][BOARD_COLUMNS] == PLAYER_O);  
 
-    assert(placeMove(BOARD_ROWS, BOARD_COLUMNS, &board, PLAYER_O) == 1);
+    assert(canApplyMove(BOARD_ROWS, BOARD_COLUMNS, &board, PLAYER_O) == TRUE);
     assert(board.cells[BOARD_ROWS][BOARD_COLUMNS] == PLAYER_O);  
 }
 
@@ -33,13 +33,13 @@ void testPlaceMoveFailedAlreadyMarked() {
     Board board = __prepareBoard();
     board.cells[5][5] = PLAYER_X;
 
-    assert(placeMove(5, 5, &board, PLAYER_O) == 0);
+    assert(canApplyMove(5, 5, &board, PLAYER_O) == FALSE);
     assert(board.cells[5][5] == PLAYER_X);
 }
 
 void testPlaceMoveFailedOutOfRange() {
     Board board = __prepareBoard();
-    assert(placeMove(BOARD_ROWS + 1, BOARD_COLUMNS, &board, PLAYER_O) == 0);
+    assert(canApplyMove(BOARD_ROWS + 1, BOARD_COLUMNS, &board, PLAYER_O) == FALSE);
 }
 
 void testGetInputExpectedStr()
@@ -51,8 +51,8 @@ void testGetInputExpectedStr()
     FILE* stdin_backup = stdin; 
 
     stdin = fmemopen(input, sizeof(input), "r");
-    assert(getInput(&x, &y) == 1);
-    assert(x == 1 && y == 2);
+    assert(isValidMoveInput(&x, &y) == TRUE);
+    assert(x == TRUE && y == 2);
 
     // 標準入力を元に戻す
     stdin = stdin_backup;
@@ -69,8 +69,8 @@ void testGetInputWithoutComma()
     
     stdin = fmemopen(input, sizeof(input), "r");
 
-    assert(getInput(&x, &y) == 1); 
-    assert(x == 1 && y == 2);
+    assert(isValidMoveInput(&x, &y) == TRUE); 
+    assert(x == TRUE && y == 2);
 
     // 標準入力を元に戻す
     stdin = stdin_backup;
@@ -87,8 +87,8 @@ void testGetInputWithSpace()
     
     stdin = fmemopen(input, sizeof(input), "r");
 
-    assert(getInput(&x, &y) == 1); 
-    assert(x == 1 && y == 2);
+    assert(isValidMoveInput(&x, &y) == TRUE); 
+    assert(x == TRUE && y == 2);
 
     // 標準入力を元に戻す
     stdin = stdin_backup;
@@ -105,8 +105,8 @@ void testGetInputWithoutSpace()
     
     stdin = fmemopen(input, sizeof(input), "r");
 
-    assert(getInput(&x, &y) == 1); 
-    assert(x == 1 && y == 2);
+    assert(isValidMoveInput(&x, &y) == TRUE); 
+    assert(x == TRUE && y == 2);
 
     // 標準入力を元に戻す
     stdin = stdin_backup;
@@ -123,8 +123,8 @@ void testGetInputFailedWithAlphabet()
     
     stdin = fmemopen(input, sizeof(input), "r");
 
-    assert(getInput(&x, &y) == 0); 
-    assert(x == 0 && y == 0);
+    assert(isValidMoveInput(&x, &y) == FALSE); 
+    assert(x == FALSE && y == FALSE);
 
     // 標準入力を元に戻す
     stdin = stdin_backup;
@@ -141,7 +141,7 @@ void testGetInputFailedFloat()
     
     stdin = fmemopen(input, sizeof(input), "r");
 
-    assert(getInput(&x, &y) == 0); 
+    assert(isValidMoveInput(&x, &y) == FALSE); 
 
     // 標準入力を元に戻す
     stdin = stdin_backup;
@@ -158,7 +158,7 @@ void testGetInputFailedEmpty()
     
     stdin = fmemopen(input, sizeof(input), "r");
 
-    assert(getInput(&x, &y) == 0); 
+    assert(isValidMoveInput(&x, &y) == FALSE); 
 
     // 標準入力を元に戻す
     stdin = stdin_backup;
@@ -174,7 +174,7 @@ void testGetInputFailedEOF()
     FILE* stdin_backup = stdin;     
     stdin = fmemopen(input, sizeof(input), "r");
 
-    assert(getInput(&x, &y) == 0); 
+    assert(isValidMoveInput(&x, &y) == FALSE); 
 
     // 標準入力を元に戻す
     stdin = stdin_backup;
@@ -191,7 +191,7 @@ void testGetInputFailedTooLongInt()
     
     stdin = fmemopen(input, sizeof(input), "r");
 
-    assert(getInput(&x, &y) == 0); 
+    assert(isValidMoveInput(&x, &y) == FALSE); 
 
     // 標準入力を元に戻す
     stdin = stdin_backup;
@@ -204,15 +204,15 @@ void testValidateInputExpectedRange() {
 
     int row = 5;
     int col = 5;
-    assert(validateInput(row, col, &board) == 1);
+    assert(isValidMove(row, col, &board) == TRUE);
 
     int rowEdgeBegin = 1;
     int colEdgeBegin = 1;
-    assert(validateInput(rowEdgeBegin, colEdgeBegin, &board) == 1);
+    assert(isValidMove(rowEdgeBegin, colEdgeBegin, &board) == TRUE);
 
     int rowEdgeEnd = BOARD_ROWS;
     int colEdgeEnd = BOARD_COLUMNS;
-    assert(validateInput(rowEdgeEnd, colEdgeEnd, &board) == 1);
+    assert(isValidMove(rowEdgeEnd, colEdgeEnd, &board) == TRUE);
 
 }
 
@@ -225,14 +225,14 @@ void testValidateInputFailedOutOfRange()
     int zeroRow = 0;
     int zeroCol = 0;
 
-    assert(validateInput(zeroRow, zeroCol, &board) == 0);
+    assert(isValidMove(zeroRow, zeroCol, &board) == FALSE);
     
     int negativeInt = -1;
     int randInt = 4;
-    assert(validateInput(negativeInt, randInt, &board) == 0);
+    assert(isValidMove(negativeInt, randInt, &board) == FALSE);
 
     int ToobigInt = 123490;
-    assert(validateInput(ToobigInt, randInt, &board) == 0);
+    assert(isValidMove(ToobigInt, randInt, &board) == FALSE);
  }
 
  void testValidateInputFailedNotEmpty() {
@@ -242,17 +242,17 @@ void testValidateInputFailedOutOfRange()
      int col = 5;
 
      board.cells[row][col] = PLAYER_O;
-    assert(validateInput(row, col, &board) == 0);
+    assert(isValidMove(row, col, &board) == FALSE);
 
     int rowEdgeBegin = 1;
     int colEdgeBegin = 1;
     board.cells[rowEdgeBegin][colEdgeBegin] = PLAYER_O;
-    assert(validateInput(rowEdgeBegin, colEdgeBegin, &board) == 0);
+    assert(isValidMove(rowEdgeBegin, colEdgeBegin, &board) == FALSE);
 
     int rowEdgeEnd = BOARD_ROWS;
     int colEdgeEnd = BOARD_COLUMNS;
     board.cells[rowEdgeEnd][colEdgeEnd] = PLAYER_O;
-    assert(validateInput(rowEdgeEnd, colEdgeEnd, &board) == 0);
+    assert(isValidMove(rowEdgeEnd, colEdgeEnd, &board) == FALSE);
  }
 
 void runPlaysTests() {

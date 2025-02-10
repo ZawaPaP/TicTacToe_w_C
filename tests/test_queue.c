@@ -44,7 +44,7 @@ void testQueuePushPop() {
     Position out3 = pop(&q);
     assert(out3.x == 5 && out3.y == 6);
     assert(q.size == 0);
-    assert(isEmpty(&q));
+    assert(isEmpty(&q) == TRUE);
 
     freeQueue(&q);
     printf("testQueuePushPop passed.\n");
@@ -63,13 +63,13 @@ void testQueueExtend()
 
     assert(q.size == QUEUE_SIZE);
     assert(q.capacity == QUEUE_SIZE);
-    assert(isFull(&q));
+    assert(isFull(&q) == TRUE);
 
     push(&q, (Position){100, 200});
 
     assert(q.size == QUEUE_SIZE + 1);
     assert(q.capacity == QUEUE_SIZE * 2);
-    assert(!isFull(&q));
+    assert(isFull(&q) == FALSE);
 
     for (int i = 0; i <= QUEUE_SIZE; i++) {
         Position p = pop(&q);
@@ -77,7 +77,7 @@ void testQueueExtend()
         assert(p.y == i * 2);
     }
 
-    assert(isEmpty(&q));
+    assert(isEmpty(&q) == TRUE);
 
     printf("Finished testQueueExtend...\n");
 }

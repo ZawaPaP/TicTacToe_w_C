@@ -4,5 +4,5 @@
 
 void playGame();
 void printGameStatus(int turnCounts, char player);
-int hasWinner(Board *board, char playerMark);
+BOOL hasWinner(Board *board, char playerMark);
 #endif

@@ -17,8 +17,8 @@ typedef struct {
 } Queue;
 
 void initQueue(Queue *q);
-int isEmpty(Queue *q);
-int isFull(Queue *q);
+BOOL isEmpty(Queue *q);
+BOOL isFull(Queue *q);
 void push(Queue *q, Position p);
 Position pop(Queue *q);
 void freeQueue(Queue *q);

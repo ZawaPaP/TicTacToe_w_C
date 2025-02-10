@@ -12,4 +12,10 @@
 
 #define QUEUE_SIZE 100
 
+typedef enum 
+{
+    TRUE = 1,
+    FALSE = 0
+} BOOL;
+
 #endif

@@ -8,8 +8,8 @@ typedef struct {
     int column;
 } Hand;
 
-int getInput(int *x, int *y);
-int placeMove(int row, int col, Board *board, char player);
-int validateInput(int row, int col, Board *board);
+BOOL isValidMoveInput(int *x, int *y);
+BOOL canApplyMove(int row, int col, Board *board, char player);
+BOOL isValidMove(int row, int col, Board *board);
 
 #endif

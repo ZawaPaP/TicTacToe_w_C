@@ -6,12 +6,12 @@
 
 
 void printGameStatus(int turnCounts, char player);
-int __isInBoardRange(int r, int c);
-int __isSameMark(char playerMark, char currCellMark);
-int __hasWinnerInDirection(Board *board, char playerMark, int startX, int startY, int move[2], int (*visited)[BOARD_COLUMNS + 1]);
-int __hasWinnerInVertical(Board *board, char playerMark);
-int __hasWinnerInHorizontal(Board *board, char playerMark);
-int __hasWinnerInCross(Board *board, char playerMark);
+BOOL __isInBoardRange(int r, int c);
+BOOL __isSameMark(char playerMark, char currCellMark);
+BOOL __hasWinnerInDirection(Board *board, char playerMark, int startX, int startY, int move[2], int (*visited)[BOARD_COLUMNS + 1]);
+BOOL __hasWinnerInVertical(Board *board, char playerMark);
+BOOL __hasWinnerInHorizontal(Board *board, char playerMark);
+BOOL __hasWinnerInCross(Board *board, char playerMark);
 
 void playGame()
 {
@@ -29,8 +29,8 @@ void playGame()
         printGameStatus(turnCounts, currentPlayer);
         while (1)
         {
-            if(getInput(&row, &col)) {
-                if (placeMove(row, col, &board, currentPlayer)) {
+            if(isValidMoveInput(&row, &col)) {
+                if (canApplyMove(row, col, &board, currentPlayer)) {
                     break;
                 }
             }
@@ -43,46 +43,48 @@ void printGameStatus(int turnCounts, char player) {
     printf("Turn %d, %c's tarn.\n",turnCounts, player);    
 }
 
-int hasWinner(Board *board, char playerMark) {
+BOOL hasWinner(Board *board, char playerMark) {
 
     if (playerMark == EMPTY_CELL)
-        return 0;
+        return FALSE;
 
     return (
-        __hasWinnerInVertical(board, playerMark) ||
-        __hasWinnerInHorizontal(board, playerMark) ||
-        __hasWinnerInCross(board, playerMark));
+               __hasWinnerInVertical(board, playerMark) ||
+               __hasWinnerInHorizontal(board, playerMark) ||
+               __hasWinnerInCross(board, playerMark))
+               ? TRUE
+               : FALSE;
 }
 
-int __hasWinnerInVertical(Board *board, char playerMark) {
+BOOL __hasWinnerInVertical(Board *board, char playerMark) {
     int move[2] = {1, 0};
     int visited[BOARD_ROWS + 1][BOARD_COLUMNS + 1] = {};
 
     for (int i = 1; i <= BOARD_ROWS; i++) {
         for (int j = 1; j <= BOARD_COLUMNS; j++) {
             if (__hasWinnerInDirection(board, playerMark, i, j, move, visited) == 1) {
-                return 1;
+                return TRUE;
             }
         }
     }
-    return 0;
+    return FALSE;
 }
 
-int __hasWinnerInHorizontal(Board *board, char playerMark) {
+BOOL __hasWinnerInHorizontal(Board *board, char playerMark) {
     int move[2] = {0, 1};
     int visited[BOARD_ROWS + 1][BOARD_COLUMNS + 1] = {};
 
     for (int i = 1; i <= BOARD_ROWS; i++) {
         for (int j = 1; j <= BOARD_COLUMNS; j++) {
             if (__hasWinnerInDirection(board, playerMark, i, j, move, visited) == 1) {
-                return 1;
+                return TRUE;
             }
         }
     }
-    return 0;
+    return FALSE;
 }
 
-int __hasWinnerInCross(Board *board, char playerMark) {
+BOOL __hasWinnerInCross(Board *board, char playerMark) {
     int move[2][2] = {{1, 1}, {1, -1}};
     int visited[BOARD_ROWS + 1][BOARD_COLUMNS + 1] = {};
 
@@ -91,15 +93,15 @@ int __hasWinnerInCross(Board *board, char playerMark) {
             for (int k = 0; k < 2; k++) {
                 if (__hasWinnerInDirection(board, playerMark, i, j, move[k], visited) == 1)
                 {
-                    return 1;
+                    return TRUE;
                 }
             }
         }
     }
-    return 0;
+    return FALSE;
 }
 
-int __hasWinnerInDirection(Board *board, char playerMark, int startX, int startY, int move[2], int (*visited)[BOARD_COLUMNS + 1]) {
+BOOL __hasWinnerInDirection(Board *board, char playerMark, int startX, int startY, int move[2], int (*visited)[BOARD_COLUMNS + 1]) {
     Queue queue;
     initQueue(&queue);
 
@@ -131,18 +133,18 @@ int __hasWinnerInDirection(Board *board, char playerMark, int startX, int startY
             }
 
             if (sequence >= WIN_LENGTH)
-                return 1;
+                return TRUE;
         }
     }
-    return 0;
+    return FALSE;
 }
 
-int __isInBoardRange(int r, int c) {
+BOOL __isInBoardRange(int r, int c) {
     if (1 <= r && r <= BOARD_ROWS && 1 <= c && c <= BOARD_COLUMNS)
-        return 1;
-    return 0;
+        return TRUE;
+    return FALSE;
 }
 
-int __isSameMark(char playerMark, char currCellMark) {
-    return playerMark == currCellMark;
+BOOL __isSameMark(char playerMark, char currCellMark) {
+    return (playerMark == currCellMark) ? TRUE : FALSE;
 }
