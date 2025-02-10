@@ -1,9 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
-
-#define WIN_LENGTH 5
+#include "constants.h"
 
 void playGame();
 void printGameStatus(int turnCounts, char player);
-int hasWinner(Board *board);
+int hasWinner(Board *board, char playerMark);
 #endif

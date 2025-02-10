@@ -1,7 +1,7 @@
 #ifndef QUEUE_H
 #define QUEUE_H
 
-#define QUEUE_SIZE 100
+#include "constants.h"
 
 typedef struct {
     int x;

@@ -1,6 +1,6 @@
 #ifndef PLAYS_H
 #define PLAYS_H
-
+#include "constants.h"
 #include "board.h"
 
 typedef struct {

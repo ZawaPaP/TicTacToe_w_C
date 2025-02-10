@@ -1,12 +1,6 @@
 #ifndef BOARD_H
 #define BOARD_H
-
-#define BOARD_ROWS 9
-#define BOARD_COLUMNS 9
-
-#define EMPTY_CELL ' '
-#define PLAYER_X 'X'
-#define PLAYER_O 'O'
+#include "constants.h"
 
 typedef struct {
     char cells[BOARD_ROWS + 1][BOARD_COLUMNS + 1];
