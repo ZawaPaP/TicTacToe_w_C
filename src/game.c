@@ -43,6 +43,14 @@ void printGameStatus(int turnCounts, char player) {
     printf("Turn %d, %c's tarn.\n",turnCounts, player);    
 }
 
+char getWinner(Board *board) {
+    if (hasWinner(board, PLAYER_X))
+        return PLAYER_X;
+    if (hasWinner(board, PLAYER_O))
+        return PLAYER_O;
+    return EMPTY_CELL;
+}
+
 BOOL hasWinner(Board *board, char playerMark) {
 
     if (playerMark == EMPTY_CELL)

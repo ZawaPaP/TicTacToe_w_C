@@ -21,6 +21,7 @@ void testHasWinnerInVerticalExpected()
 
     assert(hasWinner(&board_1, PLAYER_X) == TRUE);
     assert(hasWinner(&board_1, PLAYER_O) == FALSE);
+    assert(getWinner(&board_1) == PLAYER_X);
 
     Board board_2 = __prepareBoard();
 
@@ -32,6 +33,7 @@ void testHasWinnerInVerticalExpected()
 
     assert(hasWinner(&board_2, PLAYER_O) == TRUE);
     assert(hasWinner(&board_2, PLAYER_X) == FALSE);
+    assert(getWinner(&board_2) == PLAYER_O);
 
  }
 
@@ -46,6 +48,7 @@ void testHasWinnerInHorizontalExpected() {
 
     assert(hasWinner(&board_1, PLAYER_X) == TRUE);
     assert(hasWinner(&board_1, PLAYER_O) == FALSE);
+    assert(getWinner(&board_1) == PLAYER_X);
 
     Board board_2 = __prepareBoard();
 
@@ -57,6 +60,7 @@ void testHasWinnerInHorizontalExpected() {
 
     assert(hasWinner(&board_2, PLAYER_O) == TRUE);
     assert(hasWinner(&board_2, PLAYER_X) == FALSE);
+    assert(getWinner(&board_2) == PLAYER_O);
 
 }
 
@@ -70,6 +74,8 @@ void testHasWinnerInCrossExpected() {
 
     assert(hasWinner(&board, PLAYER_X) == TRUE);
     assert(hasWinner(&board, PLAYER_O) == FALSE);
+    assert(getWinner(&board) == PLAYER_X);
+
 }
 
 void testNotHasWinnerExpected() {
@@ -89,6 +95,7 @@ void testNotHasWinnerExpected() {
 
     assert(hasWinner(&board, PLAYER_X) == FALSE);
     assert(hasWinner(&board, PLAYER_O) == FALSE);
+    assert(getWinner(&board) == EMPTY_CELL);
 
 }
 
