@@ -20,16 +20,20 @@ BOOL __hasWinnerInHorizontal(Board *board, char playerMark);
 BOOL __hasWinnerInCross(Board *board, char playerMark);
 
 
-int selectGameMode() {
-    int mode;
+MODE selectGameMode() {
+    MODE mode;
     while(1) {
         printf("Choose game mode: (1) Player vs Player, (2) Player vs CPU, (3) CPU vs CPU: : ");
-        if (scanf("%d", &mode) != 1) {
+        int tempMode;
+        if (scanf("%d", &tempMode) != 1)
+        {
             printf("Invalid input. Please enter 1 or 2.\n");
             while (getchar() != '\n'); // 入力バッファをクリア
             continue;
         }
-        if (mode == 1 || mode == 2 || mode == 3) {
+        mode = (MODE)tempMode;
+        if (mode == PLAYER_PLAYER || mode == PLAYER_CPU || mode == CPU_CPU)
+        {
             while (getchar() != '\n'); 
             return mode;
         }
@@ -56,7 +60,7 @@ BOOL shouldPlayAgain() {
 
 void runGameLoop() {
     while (1) {
-        int mode = selectGameMode();
+        MODE mode = selectGameMode();
 
         playGame(mode);
 
@@ -80,11 +84,11 @@ void playGame(int mode)
     while(1) {
         printGameStatus(turnCounts, currentPlayer);
 
-        if (mode == 2 && currentPlayer == PLAYER_O) {
+        if (mode == PLAYER_CPU && currentPlayer == PLAYER_O) {
             getCpuMove(&row, &col, &board);
             board.cells[row][col] = currentPlayer;
             turnCounts++;
-        } else if (mode == 3) {
+        } else if (mode == CPU_CPU) {
             getCpuMove(&row, &col, &board);
             board.cells[row][col] = currentPlayer;
             turnCounts++;
@@ -134,6 +138,10 @@ void printDrawGame() {
     printf("\tDrow. Nice game!\n\n");
 }
 
+BOOL isGameOver(Board *board) {
+    return __isDrawGame(board) || getWinner(board) != EMPTY_CELL;
+}
+
 char getWinner(Board *board) {
     if (hasWinner(board, PLAYER_X))
         return PLAYER_X;
@@ -141,7 +149,6 @@ char getWinner(Board *board) {
         return PLAYER_O;
     return EMPTY_CELL;
 }
-
 
 BOOL __isDrawGame(Board *board) {
     if (getWinner(board) != EMPTY_CELL)

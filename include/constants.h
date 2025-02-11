@@ -12,10 +12,24 @@
 
 #define QUEUE_SIZE 100
 
+#define OPEN_FOUR_POINTS 200
+#define CLOSED_FOUR_POINTS 100
+#define OPEN_THREE_POINTS 100
+#define CLOSED_THREE_POINTS 50
+#define OPEN_TWO_POINTS 50
+#define CLOSED_TWO_POINTS 25
+
 typedef enum 
 {
     TRUE = 1,
     FALSE = 0
 } BOOL;
+
+typedef enum
+{
+    PLAYER_PLAYER = 1,
+    PLAYER_CPU = 2,
+    CPU_CPU = 3
+} MODE;
 
 #endif

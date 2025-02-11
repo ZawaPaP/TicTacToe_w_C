@@ -3,6 +3,7 @@
 #include "test_board.h"
 #include "test_plays.h"
 #include "test_game.h"
+#include "test_cpu.h"
 
 int main() {
     printf("\nStart running the test...\n\n");
@@ -10,6 +11,7 @@ int main() {
     runBoardTests();
     runPlaysTests();
     runGameTests();
+    runCPUTests();
 
     printf("\nFinished all tests.\n\n");
     return 0;

@@ -4,5 +4,6 @@
 
 void runGameLoop();
 char getWinner(Board *board);
+BOOL isGameOver(Board *board);
 BOOL hasWinner(Board *board, char playerMark);
 #endif
