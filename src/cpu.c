@@ -14,10 +14,11 @@ void getCpuMove(int *row, int *col, Board *board, char playerMark) {
     if (playerMark == PLAYER_O) {
         int bestRow = -1;
         int bestCol = -1;
-        int bestScore = negaMax(board, 2, playerMark, &bestRow, &bestCol);
+        int bestScore = negaMax(board, NEGA_MAX_DEPTH, playerMark, &bestRow, &bestCol);
         printf("negaMax Score: %d, move %d, %d\n", bestScore, bestRow, bestCol);
         *row = bestRow;
         *col = bestCol;
+        return;
     }
 
     while(1) {
@@ -36,7 +37,7 @@ int negaMax(Board *board, int depth, char playerMark, int* bestRow, int* bestCol
         return evaluate(board, playerMark);
     }
 
-    int maxScore = -99999;
+    int maxScore = -9999999;
     for (int i = 1; i <= BOARD_ROWS; i++) {
         for (int j = 1; j <= BOARD_COLUMNS; j++) {
             if (board->cells[i][j] == EMPTY_CELL) {
@@ -46,8 +47,10 @@ int negaMax(Board *board, int depth, char playerMark, int* bestRow, int* bestCol
                 int score = -negaMax(board, depth - 1, nextPlayerMark, bestRow, bestCol);
                 if (score > maxScore) {
                     maxScore = score;
-                    *bestRow = i;
-                    *bestCol = j;
+                    if (depth == NEGA_MAX_DEPTH) {
+                        *bestRow = i;
+                        *bestCol = j;
+                    }
                 }
 
                 board->cells[i][j] = EMPTY_CELL;
@@ -57,8 +60,7 @@ int negaMax(Board *board, int depth, char playerMark, int* bestRow, int* bestCol
     return maxScore;
 }
 
-
-int evaluate(Board *board, char playerMark) {
+int __evaluatePlayerPositions(Board *board, char playerMark) {
     int score = 0;
 
     // 縦、横、右斜め、左斜めについてそれぞれカウント済みかどうかをメモする。
@@ -82,6 +84,9 @@ int evaluate(Board *board, char playerMark) {
 
                     switch (line.length)
                     {
+                    case 5:
+                        score += WIN_POINTS;
+                        break;
                     case 4:
                         if (edge == OPEN)
                             score += OPEN_FOUR_POINTS;
@@ -110,6 +115,14 @@ int evaluate(Board *board, char playerMark) {
     return score;
 }
 
+int evaluate(Board *board, char playerMark) {
+
+    char opponentPlayer = (playerMark == PLAYER_X) ? PLAYER_O : PLAYER_X;
+    int playerScore = __evaluatePlayerPositions(board, playerMark);
+    int opponentScore = __evaluatePlayerPositions(board, opponentPlayer);
+
+    return playerScore - opponentScore;
+}
 
 connectedLine __countConnected(Board *board, int row, int col, char playerMark, BOOL (*visited)[BOARD_ROWS + 1][BOARD_COLUMNS + 1][4], int directionIndex, int (*directions)[4][2]) {
     connectedLine line;

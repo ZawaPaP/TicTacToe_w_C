@@ -5,6 +5,7 @@
 #include "board.h"
 
 void getCpuMove(int *row, int *col, Board *board, char playerMark);
+int negaMax(Board *board, int depth, char playerMark, int *bestRow, int *bestCol);
 int evaluate(Board *board, char playerMark);
 int max(int x, int y);
 

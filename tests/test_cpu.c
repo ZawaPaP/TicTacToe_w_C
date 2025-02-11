@@ -100,6 +100,22 @@ void testEvaluateMultiLine() {
     assert(evaluate(&board, PLAYER_X) == CLOSED_FOUR_POINTS * 2 + CLOSED_TWO_POINTS * 2);
 }
 
+void testNegaMax() {
+    Board board = __prepareBoard();
+    board.cells[2][2] = PLAYER_X;
+    board.cells[2][3] = PLAYER_X;
+    board.cells[2][4] = PLAYER_X;
+    board.cells[2][5] = PLAYER_X;
+    board.cells[7][9] = PLAYER_O;
+    board.cells[8][9] = PLAYER_O;
+
+    int bestRow = -1, bestCol = -1;
+    negaMax(&board, NEGA_MAX_DEPTH, PLAYER_X, &bestRow, &bestCol);
+
+    assert(bestRow == 2);
+    assert(bestCol == 1);
+}
+
 void runCPUTests(){
     printf("Start runCPUTests...\n");
     testMax();
@@ -111,5 +127,6 @@ void runCPUTests(){
     testEvaluateCloseTwo();
     testEvaluateDoubleClosedLine();
     testEvaluateMultiLine();
+    testNegaMax();
     printf("Finished runCPUTests.\n");
 }
