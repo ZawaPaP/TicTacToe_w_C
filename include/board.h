@@ -9,4 +9,5 @@ typedef struct {
 
 void printBoard(Board *board);
 void initBoard(Board *board);
+BOOL boardIsFull(Board *board);
 #endif

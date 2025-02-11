@@ -6,6 +6,12 @@
 
 
 void printGameStatus(int turnCounts, char player);
+void printWinner(Board *board);
+void printDrawGame();
+char getWinner(Board *board);
+BOOL hasWinner(Board *board, char playerMark);
+BOOL isGameEnd(Board *board, char playerMark);
+BOOL __isDrawGame(Board *board);
 BOOL __isInBoardRange(int r, int c);
 BOOL __isSameMark(char playerMark, char currCellMark);
 BOOL __hasWinnerInDirection(Board *board, char playerMark, int startX, int startY, int move[2], int (*visited)[BOARD_COLUMNS + 1]);
@@ -22,10 +28,9 @@ void playGame()
     int turnCounts = 0;
 
     printf("\n        TicTacToe Game Started!\n\n");
-
+    printBoard(&board);
     while(1) {
         turnCounts += 1;
-        printBoard(&board);
         printGameStatus(turnCounts, currentPlayer);
         while (1)
         {
@@ -35,12 +40,42 @@ void playGame()
                 }
             }
         }
+        printBoard(&board);
+        if (isGameEnd(&board, currentPlayer)) {
+            break;
+        }
         currentPlayer = (currentPlayer == PLAYER_X) ? PLAYER_O : PLAYER_X;
     }
 }
 
+
+BOOL isGameEnd(Board *board, char playerMark) {
+    if (hasWinner(board, playerMark)) {
+            printWinner(board);
+            return TRUE;
+    }
+    if (__isDrawGame(board)) {
+        printDrawGame();
+        return TRUE;
+    }
+    return FALSE;
+}
+
 void printGameStatus(int turnCounts, char player) {
     printf("Turn %d, %c's tarn.\n",turnCounts, player);    
+}
+
+void printWinner(Board *board) {
+    char winner = getWinner(board);
+    if (winner == ' ') {
+        printf("No winner yet.\n");
+    } else {
+        printf("\t\tWinner is %c!\n\n", winner);
+    }
+}
+
+void printDrawGame() {
+    printf("\tDrow. Nice game!\n\n");
 }
 
 char getWinner(Board *board) {
@@ -49,6 +84,13 @@ char getWinner(Board *board) {
     if (hasWinner(board, PLAYER_O))
         return PLAYER_O;
     return EMPTY_CELL;
+}
+
+
+BOOL __isDrawGame(Board *board) {
+    if (getWinner(board) != EMPTY_CELL)
+        return FALSE;
+    return boardIsFull(board);
 }
 
 BOOL hasWinner(Board *board, char playerMark) {
@@ -146,6 +188,7 @@ BOOL __hasWinnerInDirection(Board *board, char playerMark, int startX, int start
     }
     return FALSE;
 }
+
 
 BOOL __isInBoardRange(int r, int c) {
     if (1 <= r && r <= BOARD_ROWS && 1 <= c && c <= BOARD_COLUMNS)

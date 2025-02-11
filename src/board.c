@@ -34,3 +34,14 @@ void initBoard(Board *board) {
         }
     }
 }
+
+BOOL boardIsFull(Board *board) {
+    size_t i, j;
+    for (i = 1; i <= BOARD_ROWS; i++) {
+        for (j = 1; j <= BOARD_COLUMNS; j++) {
+            if (board->cells[i][j] == EMPTY_CELL)
+                return FALSE;
+        }
+    }
+    return TRUE;
+}
