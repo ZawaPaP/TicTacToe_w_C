@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "plays.h"
 #include "board.h"
 
@@ -16,12 +17,18 @@ BOOL canApplyMove(int row, int col, Board* board, char player) {
 BOOL isValidMoveInput(int *x, int *y){
     char str[8];
 
-    printf("Please input your hand as row, col: ");
+    printf("Please input your hand as row, col (or 'q' to quit): ");
     
     if (fgets(str, sizeof(str), stdin) == NULL) {
         printf("Error: invalid input. Try again.\n");
         return FALSE;
     }
+
+    if (str[0] == 'q') {
+        printf("\tGame Ended.\n");
+        exit(0);
+    }
+
     // sscanfは変換されたフィールドの数を返す
     if (sscanf(str, " %d , %d ", x, y) != 2 && sscanf(str, " %d %d ", x, y) != 2) {
         printf("Error: invalid input. Try again.\n");

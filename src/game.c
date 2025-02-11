@@ -10,7 +10,6 @@ void printWinner(Board *board);
 void printDrawGame();
 char getWinner(Board *board);
 BOOL hasWinner(Board *board, char playerMark);
-BOOL isGameEnd(Board *board, char playerMark);
 BOOL __isDrawGame(Board *board);
 BOOL __isInBoardRange(int r, int c);
 BOOL __isSameMark(char playerMark, char currCellMark);
@@ -25,23 +24,28 @@ void playGame()
     initBoard(&board);
     int row, col;
     char currentPlayer = PLAYER_X;
-    int turnCounts = 0;
+    int turnCounts = 1;
 
     printf("\n        TicTacToe Game Started!\n\n");
     printBoard(&board);
     while(1) {
-        turnCounts += 1;
         printGameStatus(turnCounts, currentPlayer);
         while (1)
         {
             if(isValidMoveInput(&row, &col)) {
                 if (canApplyMove(row, col, &board, currentPlayer)) {
+                    turnCounts += 1;
                     break;
                 }
             }
         }
         printBoard(&board);
-        if (isGameEnd(&board, currentPlayer)) {
+        if (hasWinner(&board, currentPlayer)) {
+            printWinner(&board);
+            break;
+        }
+        if (__isDrawGame(&board)) {
+            printDrawGame();
             break;
         }
         currentPlayer = (currentPlayer == PLAYER_X) ? PLAYER_O : PLAYER_X;
@@ -49,20 +53,8 @@ void playGame()
 }
 
 
-BOOL isGameEnd(Board *board, char playerMark) {
-    if (hasWinner(board, playerMark)) {
-            printWinner(board);
-            return TRUE;
-    }
-    if (__isDrawGame(board)) {
-        printDrawGame();
-        return TRUE;
-    }
-    return FALSE;
-}
-
 void printGameStatus(int turnCounts, char player) {
-    printf("Turn %d, %c's tarn.\n",turnCounts, player);    
+    printf("Turn %d, %c's turn.\n",turnCounts, player);    
 }
 
 void printWinner(Board *board) {
