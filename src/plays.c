@@ -6,11 +6,10 @@
 BOOL isValidMove(int row, int col, Board *board);
 
 
-BOOL canApplyMove(int row, int col, Board* board, char player) {
+BOOL canApplyMove(int row, int col, Board* board) {
     if (!isValidMove(row, col, board)) {
         return FALSE;
     }
-    board->cells[row][col] = player;
     return TRUE;
 }
 

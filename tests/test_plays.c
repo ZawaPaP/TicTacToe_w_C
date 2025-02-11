@@ -11,21 +11,16 @@
 void testPlaceMoveExpected(){
 
     Board board = __prepareBoard();
-    assert(canApplyMove(5, 5, &board, PLAYER_X) == TRUE);
-    assert(board.cells[5][5] == PLAYER_X);  
+    assert(canApplyMove(5, 5, &board) == TRUE);
 
     // ４隅のエッジケースについてテスト
-    assert(canApplyMove(1, 1, &board, PLAYER_X) == TRUE);
-    assert(board.cells[1][1] == PLAYER_X);  
+    assert(canApplyMove(1, 1, &board) == TRUE);
     
-    assert(canApplyMove(BOARD_ROWS, 1, &board, PLAYER_X) == TRUE);
-    assert(board.cells[BOARD_ROWS][1] == PLAYER_X);  
+    assert(canApplyMove(BOARD_ROWS, 1, &board) == TRUE);
 
-    assert(canApplyMove(1, BOARD_COLUMNS, &board, PLAYER_O) == TRUE);
-    assert(board.cells[1][BOARD_COLUMNS] == PLAYER_O);  
+    assert(canApplyMove(1, BOARD_COLUMNS, &board) == TRUE);
 
-    assert(canApplyMove(BOARD_ROWS, BOARD_COLUMNS, &board, PLAYER_O) == TRUE);
-    assert(board.cells[BOARD_ROWS][BOARD_COLUMNS] == PLAYER_O);  
+    assert(canApplyMove(BOARD_ROWS, BOARD_COLUMNS, &board) == TRUE);
 }
 
 
@@ -33,13 +28,12 @@ void testPlaceMoveFailedAlreadyMarked() {
     Board board = __prepareBoard();
     board.cells[5][5] = PLAYER_X;
 
-    assert(canApplyMove(5, 5, &board, PLAYER_O) == FALSE);
-    assert(board.cells[5][5] == PLAYER_X);
+    assert(canApplyMove(5, 5, &board) == FALSE);
 }
 
 void testPlaceMoveFailedOutOfRange() {
     Board board = __prepareBoard();
-    assert(canApplyMove(BOARD_ROWS + 1, BOARD_COLUMNS, &board, PLAYER_O) == FALSE);
+    assert(canApplyMove(BOARD_ROWS + 1, BOARD_COLUMNS, &board) == FALSE);
 }
 
 void testGetInputExpectedStr()

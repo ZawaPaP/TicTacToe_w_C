@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include "plays.h"
 #include "board.h"
+#include "cpu.h"
 #include "queue.h"
 #include "game.h"
 
-void playGame();
+void playGame(int mode);
 void printGameStatus(int turnCounts, char player);
 void printWinner(Board *board);
 void printDrawGame();
@@ -19,21 +20,54 @@ BOOL __hasWinnerInHorizontal(Board *board, char playerMark);
 BOOL __hasWinnerInCross(Board *board, char playerMark);
 
 
-void manageGame() {
-    while (1) {
-        playGame();
+int selectGameMode() {
+    int mode;
+    while(1) {
+        printf("Choose game mode: (1) Player vs Player, (2) Player vs CPU, (3) CPU vs CPU: : ");
+        if (scanf("%d", &mode) != 1) {
+            printf("Invalid input. Please enter 1 or 2.\n");
+            while (getchar() != '\n'); // 入力バッファをクリア
+            continue;
+        }
+        if (mode == 1 || mode == 2 || mode == 3) {
+            while (getchar() != '\n'); 
+            return mode;
+        }
+        printf("Invalid choice. Please enter 1, 2 or 3.\n");
+    }
+}
+
+BOOL shouldPlayAgain() {
+    char response;
+    while(1) {
         printf("Do you want to play again? (y/n): ");
-        
-        char response;
         scanf(" %c", &response);
-        if (response != 'y') {
-            printf("Thanks for playing!\n");
+        while (getchar() != '\n');
+
+        if (response == 'y' || response == 'Y') {
+            return TRUE;
+        }
+        if (response == 'n' || response == 'N') {
+            return FALSE;
+        }
+        printf("Invalid input. Please enter 'y' or 'n'.\n");
+    }
+}
+
+void runGameLoop() {
+    while (1) {
+        int mode = selectGameMode();
+
+        playGame(mode);
+
+        if (!shouldPlayAgain()) {
+            printf("\tThanks for playing!\n");
             break;
         }
     }
 }
 
-void playGame()
+void playGame(int mode)
 {
     Board board;
     initBoard(&board);
@@ -45,16 +79,31 @@ void playGame()
     printBoard(&board);
     while(1) {
         printGameStatus(turnCounts, currentPlayer);
-        while (1)
-        {
-            if(isValidMoveInput(&row, &col)) {
-                if (canApplyMove(row, col, &board, currentPlayer)) {
-                    turnCounts += 1;
-                    break;
+
+        if (mode == 2 && currentPlayer == PLAYER_O) {
+            getCpuMove(&row, &col, &board);
+            board.cells[row][col] = currentPlayer;
+            turnCounts++;
+        } else if (mode == 3) {
+            getCpuMove(&row, &col, &board);
+            board.cells[row][col] = currentPlayer;
+            turnCounts++;
+        }
+
+        else {
+            while (1)
+            {
+                if(isValidMoveInput(&row, &col)) {
+                    if (canApplyMove(row, col, &board)) {
+                        board.cells[row][col] = currentPlayer;
+                        turnCounts++;
+                        break;
+                    }
                 }
             }
         }
         printBoard(&board);
+        printf("Player %c placed at: %d, %d\n", currentPlayer, row, col);
         if (hasWinner(&board, currentPlayer)) {
             printWinner(&board);
             break;

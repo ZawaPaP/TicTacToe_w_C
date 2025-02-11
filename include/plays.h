@@ -9,7 +9,7 @@ typedef struct {
 } Hand;
 
 BOOL isValidMoveInput(int *x, int *y);
-BOOL canApplyMove(int row, int col, Board *board, char player);
+BOOL canApplyMove(int row, int col, Board *board);
 BOOL isValidMove(int row, int col, Board *board);
 
 #endif

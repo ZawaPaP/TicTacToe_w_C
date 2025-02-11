@@ -6,6 +6,6 @@
 
 
 int main() {
-    manageGame();
+    runGameLoop();
     return 0;
 }

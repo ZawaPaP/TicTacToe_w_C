@@ -9,7 +9,7 @@ CFLAGS := -Wall -Wextra -Werror -I$(INCLUDE)
 TARGET := Game
 BUILD_DIR := build
 
-COMMON_SRCS := src/board.c src/game.c src/plays.c src/queue.c
+COMMON_SRCS := src/board.c src/game.c src/plays.c src/queue.c src/cpu.c
 SRCS := src/main.c $(COMMON_SRCS)
 OBJS := $(SRCS:src/%.c=$(BUILD_DIR)/%.o)
 
