@@ -6,6 +6,6 @@
 
 
 int main() {
-    playGame();
+    manageGame();
     return 0;
 }

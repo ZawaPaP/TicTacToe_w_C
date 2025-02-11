@@ -2,8 +2,7 @@
 #define GAME_H
 #include "constants.h"
 
-void playGame();
-void printGameStatus(int turnCounts, char player);
+void manageGame();
 char getWinner(Board *board);
 BOOL hasWinner(Board *board, char playerMark);
 #endif

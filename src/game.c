@@ -4,7 +4,7 @@
 #include "queue.h"
 #include "game.h"
 
-
+void playGame();
 void printGameStatus(int turnCounts, char player);
 void printWinner(Board *board);
 void printDrawGame();
@@ -18,6 +18,21 @@ BOOL __hasWinnerInVertical(Board *board, char playerMark);
 BOOL __hasWinnerInHorizontal(Board *board, char playerMark);
 BOOL __hasWinnerInCross(Board *board, char playerMark);
 
+
+void manageGame() {
+    while (1) {
+        playGame();
+        printf("Do you want to play again? (y/n): ");
+        
+        char response;
+        scanf(" %c", &response);
+        if (response != 'y') {
+            printf("Thanks for playing!\n");
+            break;
+        }
+    }
+}
+
 void playGame()
 {
     Board board;
@@ -26,7 +41,7 @@ void playGame()
     char currentPlayer = PLAYER_X;
     int turnCounts = 1;
 
-    printf("\n        TicTacToe Game Started!\n\n");
+    printf("\n\tTicTacToe Game Started!\n\n");
     printBoard(&board);
     while(1) {
         printGameStatus(turnCounts, currentPlayer);
