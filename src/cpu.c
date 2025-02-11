@@ -4,8 +4,6 @@
 #include "game.h"
 #include "cpu.h"
 
-EDGE_STATUS __evaluateLineEdge(Board *board, connectedLine *line, int *direction);
-connectedLine __countConnected(Board *board, int row, int col, char playerMark, BOOL (*visited)[BOARD_ROWS + 1][BOARD_COLUMNS + 1][4], int directionIndex, int (*directions)[4][2]);
 int evaluate(Board *board, char playerMark);
 int negaMax(Board *board, int depth, char playerMark, int *bestRow, int *bestCol);
 
@@ -63,51 +61,73 @@ int negaMax(Board *board, int depth, char playerMark, int* bestRow, int* bestCol
 int __evaluatePlayerPositions(Board *board, char playerMark) {
     int score = 0;
 
-    // 縦、横、右斜め、左斜めについてそれぞれカウント済みかどうかをメモする。
-    BOOL visited[BOARD_ROWS + 1][BOARD_COLUMNS + 1][4] = {};
+    for (int d = 0; d < 4; d++) {
+        int dx = 0, dy = 0;
+        switch(d) {
+            case 0:
+                dx = 0;
+                dy = 1;
+                break;
+            case 1:
+                dx = 1;
+                dy = 0;
+                break;
+            case 2:
+                dx = 1;
+                dy = 1;
+                break;
+            case 3:
+                dx = 1;
+                dy = -1;
+                break;
+            }
 
-    int directions[4][2] = {
-        {0, 1}, // 右
-        {1, 0}, // 下
-        {1, 1}, // 右斜め下
-        {1, -1} // 左斜め下
-    };
+        for (int i = 1; i <= BOARD_ROWS; i++) {
+            for (int j = 1; j <= BOARD_COLUMNS; j++) {
+                if (board->cells[i][j] != playerMark)
+                    continue;
 
-    for (int i = 1; i <= BOARD_ROWS; i++) {
-        for (int j = 1; j <= BOARD_COLUMNS; j++) {
-            if (board->cells[i][j] == playerMark) {
-                for (int d = 0; d < 4; d++) {
-                    if(visited[i][j][d]) continue;
-                    
-                    connectedLine line = __countConnected(board, i, j, playerMark, &visited, d, &directions);
-                    EDGE_STATUS edge = __evaluateLineEdge(board, &line, directions[d]);
+                // lineの始点ではない場合、すでにカウント済みのためSkip
+                int prevX = i - dx;
+                int prevY = j - dy;
+                if (isInRange(prevX, prevY) && board->cells[prevX][prevY] == playerMark)
+                    continue;
 
-                    switch (line.length)
-                    {
-                    case 5:
-                        score += WIN_POINTS;
-                        break;
-                    case 4:
-                        if (edge == OPEN)
-                            score += OPEN_FOUR_POINTS;
-                        if (edge == SEMI_CLOSE)
-                            score += CLOSED_FOUR_POINTS;
-                        break;
-                    case 3:
-                        if (edge == OPEN)
-                            score += OPEN_THREE_POINTS;
-                        if (edge == SEMI_CLOSE)
-                            score += CLOSED_THREE_POINTS;
-                        break;
-                    case 2:
-                        if (edge == OPEN)
-                            score += OPEN_TWO_POINTS;
-                        if (edge == SEMI_CLOSE)
-                            score += CLOSED_TWO_POINTS;
-                        break;
-                    default:
-                        break;
-                    }
+                int length = 1;
+                int nextX = i + dx;
+                int nextY = j + dy;
+                while(isInRange(nextX, nextY) && board->cells[nextX][nextY] == playerMark) {
+                    length++;
+                    nextX += dx;
+                    nextY += dy;
+                }
+                EDGE_STATUS edge = OPEN;
+
+                if (!isInRange(prevX, prevY) || board->cells[prevX][prevY] != EMPTY_CELL) 
+                    edge++;
+
+                if (!isInRange(nextX, nextY) || board->cells[nextX][nextY] != EMPTY_CELL) 
+                    edge++;
+
+                if (edge == CLOSED)
+                    continue;
+
+                switch (length)
+                {
+                case 5:
+                    score += WIN_POINTS;
+                    break;
+                case 4:
+                    score += (edge == OPEN) ? OPEN_FOUR_POINTS : CLOSED_FOUR_POINTS;
+                    break;
+                case 3:
+                    score += (edge == OPEN) ? OPEN_THREE_POINTS : CLOSED_THREE_POINTS;
+                    break;
+                case 2:
+                    score += (edge == OPEN) ? OPEN_TWO_POINTS : CLOSED_TWO_POINTS;
+                    break;
+                default:
+                    break;
                 }
             }
         }
@@ -124,50 +144,6 @@ int evaluate(Board *board, char playerMark) {
     return playerScore - opponentScore;
 }
 
-connectedLine __countConnected(Board *board, int row, int col, char playerMark, BOOL (*visited)[BOARD_ROWS + 1][BOARD_COLUMNS + 1][4], int directionIndex, int (*directions)[4][2]) {
-    connectedLine line;
-    line.startRow = row;
-    line.StartCol = col;
-    line.endRow = row;
-    line.endCol = col;
-    line.length = 1;
-
-    int rowMove = (*directions)[directionIndex][0];
-    int colMove = (*directions)[directionIndex][1];
-
-    int nextRow = row + rowMove;
-    int nextCol = col + colMove;
-    while (isInRange(nextRow, nextCol)) {
-        if (board->cells[nextRow][nextCol] != playerMark) break;
-
-        line.length++;
-        line.endRow = nextRow;
-        line.endCol = nextCol;
-        (*visited)[nextRow][nextCol][directionIndex] = TRUE;
-        nextRow += rowMove;
-        nextCol += colMove;
-    }
-    return line;
-}
-
-EDGE_STATUS __evaluateLineEdge(Board *board, connectedLine* line, int *direction) {
-    EDGE_STATUS edgeStatus = OPEN;
-
-    int rowMove = direction[0];
-    int colMove = direction[1];
-
-    int prevRow = line->startRow - rowMove;
-    int prevCol = line->StartCol - colMove;
-    if (!isInRange(prevRow, prevCol) || board->cells[prevRow][prevCol] != EMPTY_CELL) 
-        edgeStatus += 1;
-
-    int nextRow = line->endRow + rowMove;
-    int nextCol = line->endCol + colMove;
-    if (!isInRange(nextRow, nextCol) || board->cells[nextRow][nextCol] != EMPTY_CELL) 
-        edgeStatus += 1;
-
-    return edgeStatus;
-}
 
 int max(int x, int y) {
     if (x >= y)

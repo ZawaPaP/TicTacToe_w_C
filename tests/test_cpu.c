@@ -21,7 +21,6 @@ void testEvaluateOpenFour() {
     board.cells[2][3] = PLAYER_X;
     board.cells[2][4] = PLAYER_X;
     board.cells[2][5] = PLAYER_X;
-
     assert(evaluate(&board, PLAYER_X) == OPEN_FOUR_POINTS);
 }
 
