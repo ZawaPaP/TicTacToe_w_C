@@ -4,8 +4,8 @@
 
 typedef struct {
     char cells[BOARD_ROWS + 1][BOARD_COLUMNS + 1];
+    int lastRow, lastCol;
 } Board;
-
 
 void printBoard(Board *board);
 void initBoard(Board *board);

@@ -28,5 +28,6 @@ void testEvaluateOpenFour() {
 void runCPUTests(){
     printf("Start runCPUTests...\n");
     testMax();
+    testEvaluateOpenFour();
     printf("Finished runCPUTests.\n");
 }

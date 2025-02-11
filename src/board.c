@@ -14,9 +14,17 @@ void printBoard(Board *board) {
         printf("%d   ", i);
         for (j = 1; j < BOARD_COLUMNS; j++)
         {
-            printf("%c | ", board->cells[i][j]);
+            if (i == board->lastRow && j == board->lastCol) {
+                printf("\x1b[32m%c\x1b[39m | ", board->cells[i][j]);
+            }
+            else
+                printf("%c | ", board->cells[i][j]);
         }
-        printf("%c\n", board->cells[i][BOARD_COLUMNS]);
+        if (i == board->lastRow && BOARD_COLUMNS == board->lastCol) {
+            printf("\x1b[32m%c\x1b[0m\n", board->cells[i][BOARD_COLUMNS]);
+        } else {
+            printf("%c\n", board->cells[i][BOARD_COLUMNS]);
+        }
 
         if (i < BOARD_ROWS)
         {
