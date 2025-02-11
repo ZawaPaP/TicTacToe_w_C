@@ -84,11 +84,9 @@ void playGame(int mode)
     while(1) {
         printGameStatus(turnCounts, currentPlayer);
 
-        if (mode == PLAYER_CPU && currentPlayer == PLAYER_O) {
-            getCpuMove(&row, &col, &board);
-        } else if (mode == CPU_CPU) {
-            getCpuMove(&row, &col, &board);
-        }
+        if ((mode == PLAYER_CPU && currentPlayer == PLAYER_O) || mode == CPU_CPU)
+            getCpuMove(&row, &col, &board, currentPlayer);
+
         else {
             while (1)
             {
@@ -103,7 +101,7 @@ void playGame(int mode)
         board.lastRow = row;
         board.lastCol = col;
         turnCounts++;
-        
+
         printBoard(&board);
         printf("Player %c placed at: %d, %d\n", currentPlayer, row, col);
         if (hasWinner(&board, currentPlayer)) {

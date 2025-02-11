@@ -11,5 +11,6 @@ typedef struct {
 BOOL isValidMoveInput(int *x, int *y);
 BOOL canApplyMove(int row, int col, Board *board);
 BOOL isValidMove(int row, int col, Board *board);
+BOOL isInRange(int row, int col);
 
 #endif

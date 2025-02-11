@@ -49,3 +49,10 @@ BOOL isValidMove(int row, int col, Board* board) {
     }
     return TRUE;
 }
+
+BOOL isInRange(int row, int col) {
+    if (row < 1 || BOARD_ROWS < row || col < 1 || BOARD_COLUMNS < col) {
+        return FALSE;
+    }
+    return TRUE;
+}
