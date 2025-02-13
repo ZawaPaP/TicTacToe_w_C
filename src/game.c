@@ -248,6 +248,34 @@ BOOL __hasWinnerInDirection(Board *board, char playerMark, int startX, int start
     return FALSE;
 }
 
+/* int countStonesWithGaps(Board* board, int x, int y){
+    int gap = 0;
+
+    for (int d = 0; d < 4; d++)
+    {
+        int dx = 0, dy = 0;
+        switch(d) {
+            case 0: dx = 0; dy = 1; break;  // 横方向
+            case 1: dx = 1; dy = 0; break;  // 縦方向
+            case 2: dx = 1; dy = 1; break;  // 右斜め
+            case 3: dx = 1; dy = -1; break; // 左斜め
+        }
+        int prevX = x - dx;
+        int prevY = y - dy;
+        int nextX = x + dx;
+        int nextY = y + dy;
+
+        int prevGapLength = 1;
+        int nextGapLength = 1;
+    }
+    return 1;
+} */
+
+
+/* BOOL __checkDoubleThree(Board *board, int x, int y) {
+
+} */
+
 
 BOOL __isInBoardRange(int r, int c) {
     if (1 <= r && r <= BOARD_ROWS && 1 <= c && c <= BOARD_COLUMNS)

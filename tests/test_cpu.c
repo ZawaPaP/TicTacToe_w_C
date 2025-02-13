@@ -130,6 +130,7 @@ void testNegaMax() {
     assert(bestCol == 1);
 }
 
+
 void runCPUTests(){
     printf("Start runCPUTests...\n");
     testMax();

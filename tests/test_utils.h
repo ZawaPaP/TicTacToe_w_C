@@ -3,5 +3,6 @@
 
 #include "../include/board.h"
 Board __prepareBoard();
-
+void initBoardWithStr(Board *board, const char *lines[BOARD_ROWS + 1]);
+void runUtilsTests();
 #endif
