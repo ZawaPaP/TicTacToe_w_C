@@ -10,4 +10,7 @@ typedef struct {
 void printBoard(Board *board);
 void initBoard(Board *board);
 BOOL boardIsFull(Board *board);
+BOOL __isInBoardRange(int r, int c);
+BOOL __isSameLine(Board *board, lineInfo *line1, lineInfo *line2, int row, int col, int dx, int dy);
+lineInfoArray __getTargetLengthLinesInDirectionCandidates(Board *board, int row, int col, int length, int dx, int dy, char playerMark);
 #endif

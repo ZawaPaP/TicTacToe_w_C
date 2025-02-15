@@ -12,13 +12,20 @@ void printDrawGame();
 char getWinner(Board *board);
 BOOL hasWinner(Board *board, char playerMark);
 BOOL __isDrawGame(Board *board);
-BOOL __isInBoardRange(int r, int c);
 BOOL __isSameMark(char playerMark, char currCellMark);
 BOOL __hasWinnerInDirection(Board *board, char playerMark, int startX, int startY, int move[2], int (*visited)[BOARD_COLUMNS + 1]);
 BOOL __hasWinnerInVertical(Board *board, char playerMark);
 BOOL __hasWinnerInHorizontal(Board *board, char playerMark);
 BOOL __hasWinnerInCross(Board *board, char playerMark);
 
+
+/* static const Direction DIRS[4] = {
+    {0, 1},    // 横
+    {1, 0},    // 縦
+    {1, 1},    // 右斜め下
+    {1, -1}    // 左斜め下
+};
+ */
 
 MODE selectGameMode() {
     MODE mode;
@@ -272,16 +279,113 @@ BOOL __hasWinnerInDirection(Board *board, char playerMark, int startX, int start
 } */
 
 
-/* BOOL __checkDoubleThree(Board *board, int x, int y) {
+lineInfoArray __getTargetLengthLinesInDirection(Board *board, int row, int col, int length, int dx, int dy, char playerMark) {
+    /*
+    dx, dy方向にちょうどlengthの長さと見做せるlineのlineInfoをarrayで返す。
+    前提: 複数存在するケースもある。
 
-} */
+    T: target 石を置く場所
+    としたときに、Tが長さlengthのラインであるかどうかの判定
+        candidates lineのうち、石の間にEmptyがあるものをGapがある、とする。
+        Gapがない場合は、Tから見てEmptyを含む側の外側がEmpty,含まない側の外側2マスがEmptyであること
+        Gapがある場合は、Tから見てlineの両端がEmptyであること
+        2を満たす例 ( | はcandidatesのline両端を表す)
+            Gapなし
+                _|_XXT|__,
+                _|_XTX|__,
+                __|TXX_|_,
+            Gapあり
+                _|X_XT|_,
+                _|XT_X|_,
+    */
+    lineInfoArray candidates = __getTargetLengthLinesInDirectionCandidates(board, row, col, length, dx, dy, playerMark);
+        
+    lineInfoArray result = {0};
+
+    printf("%d candidates\n", candidates.count);
+    for (int i = 0; i < candidates.count; i++)
+    {
+        lineInfo candidate = candidates.lines[i];
+        BOOL isValid = FALSE;
+        
+        // ラインの両端の外側をチェック
+        int startX = row + ((candidate.startIdx - 1) * dx);
+        int startY = col + ((candidate.startIdx - 1) * dy);
+        int endX = row + ((candidate.endIdx + 1) * dx);
+        int endY = col + ((candidate.endIdx + 1) * dy);
+        
+        if (candidate.hasGap) {
+            // 飛び石パターンの場合：両端が空いている必要がある
+            if (__isInBoardRange(startX, startY) && 
+                __isInBoardRange(endX, endY) &&
+                board->cells[startX][startY] == EMPTY_CELL &&
+                board->cells[endX][endY] == EMPTY_CELL) {
+                isValid = TRUE;
+            }
+        } else {
+            // 連続パターンの場合：片方の端が2マス空いている必要がある
+            int startX2 = row + ((candidate.startIdx - 2) * dx);
+            int startY2 = col + ((candidate.startIdx - 2) * dy);
+            int endX2 = row + ((candidate.endIdx + 2) * dx);
+            int endY2 = col + ((candidate.endIdx + 2) * dy);
+            
+            // 始点側が空いているケース
+            if (__isInBoardRange(startX, startY) && 
+                __isInBoardRange(startX2, startY2) &&
+                board->cells[startX][startY] == EMPTY_CELL &&
+                board->cells[startX2][startY2] == EMPTY_CELL) {
+                isValid = TRUE;
+            }
+            
+            // 終点側が空いているケース
+            if (__isInBoardRange(endX, endY) && 
+                __isInBoardRange(endX2, endY2) &&
+                board->cells[endX][endY] == EMPTY_CELL &&
+                board->cells[endX2][endY2] == EMPTY_CELL) {
+                isValid = TRUE;
+            }
+        }
 
 
-BOOL __isInBoardRange(int r, int c) {
-    if (1 <= r && r <= BOARD_ROWS && 1 <= c && c <= BOARD_COLUMNS)
-        return TRUE;
-    return FALSE;
+        printf("Found line %d: startIdx=%d endIdx=%d hasGap=%d isValid=%d\n", 
+                result.count + 1, candidate.startIdx, candidate.endIdx, candidate.hasGap, isValid);
+
+        if (isValid) {
+            BOOL isDuplicate = FALSE;
+    
+            // 既存のラインとの重複チェック
+            for (int j = 0; j < result.count; j++) {
+                if (__isSameLine(board, &candidate, &result.lines[j], row, col, dx, dy)) {
+                    isDuplicate = TRUE;
+                    break;
+                }
+            }
+    
+            if (!isDuplicate || result.count == 0) {
+                result.lines[result.count] = candidate;
+                result.count++;
+            }
+        }
+    }
+
+    return result;
 }
+
+    /* BOOL __isDoubleThree(Board *board, int x, int y) {
+        for (int d = 0; d < 4; d++)
+        {
+            int dx = 0, dy = 0;
+            switch(d) {
+                case 0: dx = 0; dy = 1; break;  // 横方向
+                case 1: dx = 1; dy = 0; break;  // 縦方向
+                case 2: dx = 1; dy = 1; break;  // 右斜め
+                case 3: dx = 1; dy = -1; break; // 左斜め
+            }
+        }
+
+    } */
+
+
 
 BOOL __isSameMark(char playerMark, char currCellMark) {
     return (playerMark == currCellMark) ? TRUE : FALSE;

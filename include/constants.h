@@ -50,4 +50,21 @@ typedef enum
     CLOSED = 2
 } EDGE_STATUS;
 
+// 方向を表す構造体
+typedef struct {
+    int dx;  // x方向の変化量
+    int dy;  // y方向の変化量
+} Direction;
+
+typedef struct {
+    int startIdx;
+    int endIdx;
+    BOOL hasGap;
+} lineInfo;
+
+typedef struct {
+    lineInfo lines[10];
+    int count;
+} lineInfoArray;
+
 #endif
