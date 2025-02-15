@@ -1,38 +1,14 @@
 #include <stdio.h>
 #include "board.h"
 
-void printBoard(Board *board) {
-    int i, j, k;
-    printf("    ");
-    for (k = 1; k <= BOARD_COLUMNS; k++) {
-        printf("%d   ", k);
-    }
-    printf("\n\n");
+static const Direction DIRS[4] = {
+    {1, 0},   // 垂直方向 (↓)
+    {0, 1},   // 水平方向 (→)
+    {1, 1},   // 右下がり斜め (↘)
+    {1, -1}   // 右上がり斜め (↗)
+};
 
-    for (i = 1; i <= BOARD_ROWS; i++)
-    {
-        printf("%d   ", i);
-        for (j = 1; j < BOARD_COLUMNS; j++)
-        {
-            if (i == board->lastRow && j == board->lastCol) {
-                printf("\x1b[32m%c\x1b[39m | ", board->cells[i][j]);
-            }
-            else
-                printf("%c | ", board->cells[i][j]);
-        }
-        if (i == board->lastRow && BOARD_COLUMNS == board->lastCol) {
-            printf("\x1b[32m%c\x1b[0m\n", board->cells[i][BOARD_COLUMNS]);
-        } else {
-            printf("%c\n", board->cells[i][BOARD_COLUMNS]);
-        }
-
-        if (i < BOARD_ROWS)
-        {
-            printf("    - + - + - + - + - + - + - + - + - \n");
-        }
-    }
-    printf("\n\n");
-}
+static const int dirLength = 4;
 
 void initBoard(Board *board) {
     size_t i, j;
@@ -54,12 +30,43 @@ BOOL boardIsFull(Board *board) {
     return TRUE;
 }
 
-BOOL __isInBoardRange(int r, int c) {
+BOOL isInBoard(int r, int c) {
     if (1 <= r && r <= BOARD_ROWS && 1 <= c && c <= BOARD_COLUMNS)
         return TRUE;
     return FALSE;
 }
 
+
+
+
+BOOL isWinMove(Board *board, int r, int c, char playerMark) {
+    if (playerMark == EMPTY_CELL)
+        return FALSE;
+
+    for (int dir = 0; dir < dirLength; dir++) {
+        int dx = DIRS[dir].dx;
+        int dy = DIRS[dir].dy;
+        int length = 1;
+
+        for (int reverse = 0; reverse <= 1; reverse++) {
+            int nextX = r + (reverse == 0 ? -dx : dx);
+            int nextY = c + (reverse == 0 ? -dy : dy);
+
+            while (isInBoard(nextX, nextY)) {
+                if (board->cells[nextX][nextY] == playerMark) {
+                    length++;
+                    nextX += (reverse == 0 ? -dx : dx);
+                    nextY += (reverse == 0 ? -dy : dy);
+                }
+                else
+                    break;
+            }
+        }
+        if ((playerMark == PLAYER_O && length >= 5) || length == 5)
+            return TRUE;
+    }
+    return FALSE;
+}
 
 BOOL __isSameLine(Board* board, lineInfo* line1, lineInfo* line2, int row, int col, int dx, int dy) {
     // Gapなしのラインが2種類以上あることはない。
@@ -133,7 +140,7 @@ lineInfoArray __getTargetLengthLinesInDirectionCandidates(Board *board, int row,
             int x = row + (j * dx);
             int y = col + (j * dy);
 
-            if (!__isInBoardRange(x, y)) {
+            if (!isInBoard(x, y)) {
                 isValid = FALSE;
                 break;
             }

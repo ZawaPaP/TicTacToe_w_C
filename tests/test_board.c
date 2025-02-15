@@ -7,73 +7,6 @@
 #include "test_board.h"
 
 
-void testPrintBoard(){
-    printf("Start testPrintBoard...\n");
-
-    Board board;
-
-    initBoard(&board);
-
-    board.cells[1][1] = PLAYER_X;
-    board.cells[5][7] = PLAYER_O;
-    board.cells[9][9] = PLAYER_X;
-
-    freopen("test_print_board_output.txt", "w", stdout);
-    printBoard(&board);
-    freopen("/dev/tty", "w", stdout);
-
-    FILE* fp = fopen("test_print_board_output.txt", "r");
-    if (!fp) {
-        printf("Failed to open test_print_board_output.txt\n");
-        return;
-    }
-
-    const char *expected[] = {
-        "    1   2   3   4   5   6   7   8   9   \n",
-        "\n",
-        "1   X |   |   |   |   |   |   |   |  \n",
-        "    - + - + - + - + - + - + - + - + - \n",
-        "2     |   |   |   |   |   |   |   |  \n",
-        "    - + - + - + - + - + - + - + - + - \n",
-        "3     |   |   |   |   |   |   |   |  \n",
-        "    - + - + - + - + - + - + - + - + - \n",
-        "4     |   |   |   |   |   |   |   |  \n",
-        "    - + - + - + - + - + - + - + - + - \n",
-        "5     |   |   |   |   |   | O |   |  \n",
-        "    - + - + - + - + - + - + - + - + - \n",
-        "6     |   |   |   |   |   |   |   |  \n",
-        "    - + - + - + - + - + - + - + - + - \n",
-        "7     |   |   |   |   |   |   |   |  \n",
-        "    - + - + - + - + - + - + - + - + - \n",
-        "8     |   |   |   |   |   |   |   |  \n",
-        "    - + - + - + - + - + - + - + - + - \n",
-        "9     |   |   |   |   |   |   |   | X\n",
-        "\n", 
-        NULL
-        };
-
-    char buffer[100];
-    int line = 0;
-    int pass = 1;
-
-    while(fgets(buffer, sizeof(buffer), fp) != NULL) {
-
-        if (expected[line] == NULL) break;
-
-        if (strcmp(buffer, expected[line]) != 0) {
-            printf("Error: Mismatch on line %d:\nExpected: \"%s\"\nGot:      \"%s\"\n", line + 1, expected[line], buffer);
-            pass = 0;
-        }
-        line++;
-    }
-    fclose(fp);
-    if (pass) {
-        printf("test testPrintBoard success.\n");
-    } else {
-        printf("test Failed.\n");
-    }
-    remove("test_print_board_output.txt");
-}
 
 void testInitBoard()
 {
@@ -96,6 +29,86 @@ void testInitBoard()
         }
     }
     printf("test testInitBoard success.\n");
+}
+
+void testIsWinMove() {
+    printf("Start testIsWinMove...\n");
+
+    Board board;
+
+    // 横に5つ並んでいる
+    const char *testBoard1[] = {
+        NULL,
+        ".........",
+        "..XXXX@..",
+        ".........",
+        ".........",
+        ".........",
+        ".........",
+        ".........",
+        ".........",
+        "O@OOO...."
+    };
+    
+    initBoardWithStr(&board, testBoard1);
+    assert(isWinMove(&board, 2, 7, PLAYER_X) == TRUE);
+    assert(isWinMove(&board, 9, 2, PLAYER_O) == TRUE);
+
+    // 左上隅、FALSE case & TRUE case
+    const char *testBoard2[] = {
+        NULL,
+        "@XXXX....",
+        "O........",
+        "O........",
+        ".........",
+        "O........",
+        ".........",
+        ".........",
+        ".........",
+        "........."
+    };
+    
+    initBoardWithStr(&board, testBoard2);
+    assert(isWinMove(&board, 1, 1, PLAYER_O) == FALSE);
+    assert(isWinMove(&board, 1, 1, PLAYER_X) == TRUE);
+
+    // 長さが5を超えるケース
+    const char *testBoard3[] = {
+        NULL,
+        ".........",
+        "X........",
+        "X........",
+        "X..O.....",
+        "@...O....",
+        "X....O...",
+        "X.....O..",
+        ".......O.",
+        "........@"
+    };
+    
+    initBoardWithStr(&board, testBoard3);
+    assert(isWinMove(&board, 5, 1, PLAYER_X) == FALSE);
+    assert(isWinMove(&board, 9, 9, PLAYER_O) == TRUE);
+
+    //
+    const char *testBoard4[] = {
+        NULL,
+        ".........",
+        "......X..",
+        ".....@...",
+        "....X....",
+        "...X.....",
+        "..X......",
+        ".........",
+        ".........",
+        "........."
+    };
+    
+    initBoardWithStr(&board, testBoard4);
+    assert(isWinMove(&board, 3, 6, PLAYER_X) == TRUE);
+
+
+    printf("Success testIsWinMove.\n");
 }
 
 
@@ -196,8 +209,8 @@ void testIsSameLine() {
 
 void runBoardTests() {
     printf("Start runBoardTests...\n");
-    testPrintBoard();
     testInitBoard();
+    testIsWinMove();
     testIsSameLine();
     printf("Finished runBoardTests.\n");
 }

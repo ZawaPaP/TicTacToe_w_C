@@ -7,6 +7,72 @@
 #include "test_plays.h"
 
 
+void testPrintBoard(){
+    printf("Start testPrintBoard...\n");
+
+    Board board;
+
+    initBoard(&board);
+
+    board.cells[1][1] = PLAYER_X;
+    board.cells[5][7] = PLAYER_O;
+    board.cells[9][9] = PLAYER_X;
+
+    freopen("test_print_board_output.txt", "w", stdout);
+    printBoard(&board);
+    freopen("/dev/tty", "w", stdout);
+
+    FILE* fp = fopen("test_print_board_output.txt", "r");
+    if (!fp) {
+        printf("Failed to open test_print_board_output.txt\n");
+        return;
+    }
+
+    const char *expected[] = {
+        "    1   2   3   4   5   6   7   8   9   \n",
+        "\n",
+        "1   X |   |   |   |   |   |   |   |  \n",
+        "    - + - + - + - + - + - + - + - + - \n",
+        "2     |   |   |   |   |   |   |   |  \n",
+        "    - + - + - + - + - + - + - + - + - \n",
+        "3     |   |   |   |   |   |   |   |  \n",
+        "    - + - + - + - + - + - + - + - + - \n",
+        "4     |   |   |   |   |   |   |   |  \n",
+        "    - + - + - + - + - + - + - + - + - \n",
+        "5     |   |   |   |   |   | O |   |  \n",
+        "    - + - + - + - + - + - + - + - + - \n",
+        "6     |   |   |   |   |   |   |   |  \n",
+        "    - + - + - + - + - + - + - + - + - \n",
+        "7     |   |   |   |   |   |   |   |  \n",
+        "    - + - + - + - + - + - + - + - + - \n",
+        "8     |   |   |   |   |   |   |   |  \n",
+        "    - + - + - + - + - + - + - + - + - \n",
+        "9     |   |   |   |   |   |   |   | X\n",
+        "\n", 
+        NULL
+        };
+
+    char buffer[100];
+    int line = 0;
+    int pass = 1;
+
+    while(fgets(buffer, sizeof(buffer), fp) != NULL) {
+
+        if (expected[line] == NULL) break;
+
+        if (strcmp(buffer, expected[line]) != 0) {
+            printf("Error: Mismatch on line %d:\nExpected: \"%s\"\nGot:      \"%s\"\n", line + 1, expected[line], buffer);
+            pass = 0;
+        }
+        line++;
+    }
+    fclose(fp);
+
+    assert(pass == TRUE);
+    remove("test_print_board_output.txt");
+}
+
+
 
 void testPlaceMoveExpected(){
 
@@ -251,6 +317,7 @@ void testValidateInputFailedOutOfRange()
 
 void runPlaysTests() {
     printf("Start runPlaysTests...\n");
+    testPrintBoard();
     printf("Start placeMoveTests...\n");
     testPlaceMoveExpected();
     testPlaceMoveFailedAlreadyMarked();

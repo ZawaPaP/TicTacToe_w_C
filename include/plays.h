@@ -3,14 +3,12 @@
 #include "constants.h"
 #include "board.h"
 
-typedef struct {
-    int row;
-    int column;
-} Hand;
 
 BOOL isValidMoveInput(int *x, int *y);
 BOOL canApplyMove(int row, int col, Board *board);
 BOOL isValidMove(int row, int col, Board *board);
-BOOL isInRange(int row, int col);
-
+void printBoard(Board *board);
+void printGameStatus(int turnCounts, char player);
+void printWinner(char player);
+void printDrawGame();
 #endif

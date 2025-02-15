@@ -6,6 +6,52 @@
 BOOL isValidMove(int row, int col, Board *board);
 
 
+void printBoard(Board *board) {
+    int i, j, k;
+    printf("    ");
+    for (k = 1; k <= BOARD_COLUMNS; k++) {
+        printf("%d   ", k);
+    }
+    printf("\n\n");
+
+    for (i = 1; i <= BOARD_ROWS; i++)
+    {
+        printf("%d   ", i);
+        for (j = 1; j < BOARD_COLUMNS; j++)
+        {
+            if (i == board->lastRow && j == board->lastCol) {
+                printf("\x1b[32m%c\x1b[39m | ", board->cells[i][j]);
+            }
+            else
+                printf("%c | ", board->cells[i][j]);
+        }
+        if (i == board->lastRow && BOARD_COLUMNS == board->lastCol) {
+            printf("\x1b[32m%c\x1b[0m\n", board->cells[i][BOARD_COLUMNS]);
+        } else {
+            printf("%c\n", board->cells[i][BOARD_COLUMNS]);
+        }
+
+        if (i < BOARD_ROWS)
+        {
+            printf("    - + - + - + - + - + - + - + - + - \n");
+        }
+    }
+    printf("\n\n");
+}
+
+void printGameStatus(int turnCounts, char player) {
+    printf("Turn %d, %c's turn.\n",turnCounts, player);    
+}
+
+void printWinner(char player) {
+    printf("\t\tWinner is %c!\n\n", player);
+}
+
+void printDrawGame() {
+    printf("\tDrow. Nice game!\n\n");
+}
+
+
 BOOL canApplyMove(int row, int col, Board* board) {
     if (!isValidMove(row, col, board)) {
         return FALSE;
@@ -50,9 +96,3 @@ BOOL isValidMove(int row, int col, Board* board) {
     return TRUE;
 }
 
-BOOL isInRange(int row, int col) {
-    if (row < 1 || BOARD_ROWS < row || col < 1 || BOARD_COLUMNS < col) {
-        return FALSE;
-    }
-    return TRUE;
-}

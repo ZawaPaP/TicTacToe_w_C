@@ -32,7 +32,7 @@ void getCpuMove(int *row, int *col, Board *board, char playerMark) {
 }
 
 int negaMax(Board *board, int depth, char playerMark, int* bestRow, int* bestCol) {
-    if (depth == 0 || isGameOver(board)) {
+    if (depth == 0 || isGameOver(board, bestRow, bestCol, playerMark)) {
         return evaluate(board, playerMark);
     }
 
@@ -66,13 +66,13 @@ int __evaluateLengths(Board *board, int i, int j, int dx, int dy, char playerMar
     // lineの始点ではない場合、すでにカウント済みのためSkip
     int prevX = i - dx;
     int prevY = j - dy;
-    if (isInRange(prevX, prevY) && board->cells[prevX][prevY] == playerMark)
+    if (isInBoard(prevX, prevY) && board->cells[prevX][prevY] == playerMark)
         return score;
 
     int length = 1;
     int nextX = i + dx;
     int nextY = j + dy;
-    while (isInRange(nextX, nextY) && board->cells[nextX][nextY] == playerMark)
+    while (isInBoard(nextX, nextY) && board->cells[nextX][nextY] == playerMark)
     {
         length++;
         nextX += dx;
@@ -80,10 +80,10 @@ int __evaluateLengths(Board *board, int i, int j, int dx, int dy, char playerMar
     }
     EDGE_STATUS edge = OPEN;
 
-    if (!isInRange(prevX, prevY) || board->cells[prevX][prevY] != EMPTY_CELL) 
+    if (!isInBoard(prevX, prevY) || board->cells[prevX][prevY] != EMPTY_CELL) 
         edge++;
 
-    if (!isInRange(nextX, nextY) || board->cells[nextX][nextY] != EMPTY_CELL) 
+    if (!isInBoard(nextX, nextY) || board->cells[nextX][nextY] != EMPTY_CELL) 
         edge++;
 
     if (edge == CLOSED)
@@ -123,7 +123,7 @@ int __evaluatePositions(Board *board, int row, int col, char playerMark) {
         int newRow = row + DIRS[d][0];
         int newCol = col + DIRS[d][1];
 
-        if (isInRange(newRow, newCol))
+        if (isInBoard(newRow, newCol))
         {
             if (board->cells[newRow][newCol] == EMPTY_CELL ||
                 board->cells[newRow][newCol] == playerMark) {

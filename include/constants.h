@@ -36,6 +36,11 @@ typedef enum
     FALSE = 0
 } BOOL;
 
+typedef struct {
+    char cells[BOARD_ROWS + 1][BOARD_COLUMNS + 1];
+    int lastRow, lastCol;
+} Board;
+
 typedef enum
 {
     PLAYER_PLAYER = 1,

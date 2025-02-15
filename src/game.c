@@ -6,18 +6,8 @@
 #include "game.h"
 
 void playGame(int mode);
-void printGameStatus(int turnCounts, char player);
-void printWinner(Board *board);
-void printDrawGame();
 char getWinner(Board *board);
-BOOL hasWinner(Board *board, char playerMark);
 BOOL __isDrawGame(Board *board);
-BOOL __isSameMark(char playerMark, char currCellMark);
-BOOL __hasWinnerInDirection(Board *board, char playerMark, int startX, int startY, int move[2], int (*visited)[BOARD_COLUMNS + 1]);
-BOOL __hasWinnerInVertical(Board *board, char playerMark);
-BOOL __hasWinnerInHorizontal(Board *board, char playerMark);
-BOOL __hasWinnerInCross(Board *board, char playerMark);
-
 
 /* static const Direction DIRS[4] = {
     {0, 1},    // 横
@@ -111,8 +101,8 @@ void playGame(int mode)
 
         printBoard(&board);
         printf("Player %c placed at: %d, %d\n", currentPlayer, row, col);
-        if (hasWinner(&board, currentPlayer)) {
-            printWinner(&board);
+        if (isWinMove(&board, row, col, currentPlayer)) {
+            printWinner(currentPlayer);
             break;
         }
         if (__isDrawGame(&board)) {
@@ -124,136 +114,14 @@ void playGame(int mode)
 }
 
 
-void printGameStatus(int turnCounts, char player) {
-    printf("Turn %d, %c's turn.\n",turnCounts, player);    
-}
-
-void printWinner(Board *board) {
-    char winner = getWinner(board);
-    if (winner == ' ') {
-        printf("No winner yet.\n");
-    } else {
-        printf("\t\tWinner is %c!\n\n", winner);
-    }
-}
-
-void printDrawGame() {
-    printf("\tDrow. Nice game!\n\n");
-}
-
-BOOL isGameOver(Board *board) {
-    return __isDrawGame(board) || getWinner(board) != EMPTY_CELL;
-}
-
-char getWinner(Board *board) {
-    if (hasWinner(board, PLAYER_X))
-        return PLAYER_X;
-    if (hasWinner(board, PLAYER_O))
-        return PLAYER_O;
-    return EMPTY_CELL;
+BOOL isGameOver(Board *board, int* row, int* col, char player) {
+    return __isDrawGame(board) || isWinMove(board, *row, *col, player);
 }
 
 BOOL __isDrawGame(Board *board) {
-    if (getWinner(board) != EMPTY_CELL)
-        return FALSE;
     return boardIsFull(board);
 }
 
-BOOL hasWinner(Board *board, char playerMark) {
-
-    if (playerMark == EMPTY_CELL)
-        return FALSE;
-
-    return (
-               __hasWinnerInVertical(board, playerMark) ||
-               __hasWinnerInHorizontal(board, playerMark) ||
-               __hasWinnerInCross(board, playerMark))
-               ? TRUE
-               : FALSE;
-}
-
-BOOL __hasWinnerInVertical(Board *board, char playerMark) {
-    int move[2] = {1, 0};
-    int visited[BOARD_ROWS + 1][BOARD_COLUMNS + 1] = {};
-
-    for (int i = 1; i <= BOARD_ROWS; i++) {
-        for (int j = 1; j <= BOARD_COLUMNS; j++) {
-            if (__hasWinnerInDirection(board, playerMark, i, j, move, visited) == 1) {
-                return TRUE;
-            }
-        }
-    }
-    return FALSE;
-}
-
-BOOL __hasWinnerInHorizontal(Board *board, char playerMark) {
-    int move[2] = {0, 1};
-    int visited[BOARD_ROWS + 1][BOARD_COLUMNS + 1] = {};
-
-    for (int i = 1; i <= BOARD_ROWS; i++) {
-        for (int j = 1; j <= BOARD_COLUMNS; j++) {
-            if (__hasWinnerInDirection(board, playerMark, i, j, move, visited) == 1) {
-                return TRUE;
-            }
-        }
-    }
-    return FALSE;
-}
-
-BOOL __hasWinnerInCross(Board *board, char playerMark) {
-    int move[2][2] = {{1, 1}, {1, -1}};
-    int visited[BOARD_ROWS + 1][BOARD_COLUMNS + 1] = {};
-
-    for (int i = 1; i <= BOARD_ROWS; i++) {
-        for (int j = 1; j <= BOARD_COLUMNS; j++) {
-            for (int k = 0; k < 2; k++) {
-                if (__hasWinnerInDirection(board, playerMark, i, j, move[k], visited) == 1)
-                {
-                    return TRUE;
-                }
-            }
-        }
-    }
-    return FALSE;
-}
-
-BOOL __hasWinnerInDirection(Board *board, char playerMark, int startX, int startY, int move[2], int (*visited)[BOARD_COLUMNS + 1]) {
-    Queue queue;
-    initQueue(&queue);
-
-    int sequence = 1;
-
-    if (board->cells[startX][startY] != playerMark)
-        return 0;
-
-    if (visited[startX][startY] == 1) {
-        return 0;
-    }
-    Position pos = {startX, startY};
-
-    push(&queue, pos);
-    visited[startX][startY] = 1;
-
-    while(!isEmpty(&queue)) {
-        Position currPos = pop(&queue);
-
-        Position nextCell = {currPos.x + move[0], currPos.y + move[1]};
-        if (__isInBoardRange(nextCell.x, nextCell.y) == 1 && visited[nextCell.x][nextCell.y] == 0)
-        {
-            char currMark = board->cells[nextCell.x][nextCell.y];
-            if (__isSameMark(playerMark, currMark))
-            {
-                sequence += 1;
-                push(&queue, nextCell);
-                visited[nextCell.x][nextCell.y] = 1;
-            }
-
-            if (sequence >= WIN_LENGTH)
-                return TRUE;
-        }
-    }
-    return FALSE;
-}
 
 /* int countStonesWithGaps(Board* board, int x, int y){
     int gap = 0;
@@ -315,8 +183,8 @@ lineInfoArray __getTargetLengthLinesInDirection(Board *board, int row, int col, 
         
         if (candidate.hasGap) {
             // 飛び石パターンの場合：両端が空いている必要がある
-            if (__isInBoardRange(startX, startY) && 
-                __isInBoardRange(endX, endY) &&
+            if (isInBoard(startX, startY) && 
+                isInBoard(endX, endY) &&
                 board->cells[startX][startY] == EMPTY_CELL &&
                 board->cells[endX][endY] == EMPTY_CELL) {
                 isValid = TRUE;
@@ -329,16 +197,16 @@ lineInfoArray __getTargetLengthLinesInDirection(Board *board, int row, int col, 
             int endY2 = col + ((candidate.endIdx + 2) * dy);
             
             // 始点側が空いているケース
-            if (__isInBoardRange(startX, startY) && 
-                __isInBoardRange(startX2, startY2) &&
+            if (isInBoard(startX, startY) && 
+                isInBoard(startX2, startY2) &&
                 board->cells[startX][startY] == EMPTY_CELL &&
                 board->cells[startX2][startY2] == EMPTY_CELL) {
                 isValid = TRUE;
             }
             
             // 終点側が空いているケース
-            if (__isInBoardRange(endX, endY) && 
-                __isInBoardRange(endX2, endY2) &&
+            if (isInBoard(endX, endY) && 
+                isInBoard(endX2, endY2) &&
                 board->cells[endX][endY] == EMPTY_CELL &&
                 board->cells[endX2][endY2] == EMPTY_CELL) {
                 isValid = TRUE;
@@ -382,7 +250,7 @@ BOOL __wouldCreateOverline(Board* board, int row, int col, int dx, int dy, char 
         int tx = row + (dir == 0 ? -dx : dx);
         int ty = col + (dir == 0 ? -dy : dy);
         
-        while (__isInBoardRange(tx, ty)) {
+        while (isInBoard(tx, ty)) {
             if (board->cells[tx][ty] == playerMark) {
                 if (filledGap[dir] == 0) {
                     continuous[dir]++;
@@ -403,8 +271,6 @@ BOOL __wouldCreateOverline(Board* board, int row, int col, int dx, int dy, char 
         }
     }
     board->cells[row][col] = EMPTY_CELL;
-
-    printf("leftco: %d rightco: %d leftov: %d rightov: %d\n", continuous[0], continuous[1], continuousOverGap[0], continuousOverGap[1]);
 
     int leftGapLength = continuousOverGap[0] + continuous[0] + continuous[1] + 1;
     int rightGapLength = continuous[0] + continuous[1] + continuousOverGap[1] + 1;
@@ -446,10 +312,4 @@ lineInfoArray __getEffectiveLines(Board *board, int row, int col, lineInfoArray*
     
     printf("Found %d effective lines\n", effectiveLines.count);
     return effectiveLines;
-}
-
-
-
-BOOL __isSameMark(char playerMark, char currCellMark) {
-    return (playerMark == currCellMark) ? TRUE : FALSE;
 }
