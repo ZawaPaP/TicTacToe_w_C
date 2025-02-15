@@ -260,6 +260,65 @@ void testGetTargetLengthLinesInDirection() {
     printf("All testGetTargetLengthLinesInDirection passed!\n");
 }
 
+
+void testWouldCreateOverline() {
+    Board board;
+
+    printf("Start testWouldCreateOverline...\n");
+
+    // @に石を置くと、4x4に見えるが、横の列は完成させると長連を作るため、
+    // 横の列は完成させることができず4と見做されない。
+    const char *testBoard1[] = {
+            NULL,
+            ".........",
+            "X.@XXXO..", 
+            "..X......",
+            "..X......",
+            "..X......",
+            ".........",
+            ".........",
+            ".........",
+            "........."
+        };
+    initBoardWithStr(&board, testBoard1);
+    assert(__wouldCreateOverline(&board, 2, 3, 0, 1, PLAYER_X) == TRUE);
+
+    // @に石を置くと、4x4になる
+    // {2, 1}に石を置くと、5を作れてしまうため４として成立している。
+    const char *testBoard2[] = {
+            NULL,
+            ".........",
+            ".X@XX.X..", 
+            "..X......",
+            "..X......",
+            "..X......",
+            ".........",
+            ".........",
+            ".........",
+            "........."
+        };
+    initBoardWithStr(&board, testBoard2);
+    assert(__wouldCreateOverline(&board, 2, 3, 0, 1, PLAYER_X) == FALSE);
+
+    // 横の列を完成させようとすると長連になってしまうため、@に石を置いても、4x4ににならない
+    const char *testBoard3[] = {
+            NULL,
+            ".........",
+            "OX@XX.X..", 
+            "..X......",
+            "..X......",
+            "..X......",
+            ".........",
+            ".........",
+            ".........",
+            "........."
+        };
+    initBoardWithStr(&board, testBoard3);
+    assert(__wouldCreateOverline(&board, 2, 3, 0, 1, PLAYER_X) == TRUE);
+    printf("All testWouldCreateOverline passed!\n");
+
+}
+
 /* void testIsThree(){
     assert(__getTargetLengthLinesInDirection("..XX@..", 5) == TRUE);  // @の場所に石を置いたら三になる
     assert(__getTargetLengthLinesInDirection("..@XX..", 3) == TRUE);  // @の場所に石を置いたら三になる
@@ -306,6 +365,7 @@ void runGameTests() {
     testHasWinnerInCrossExpected();
     testNotHasWinnerExpected();
     testGetTargetLengthLinesInDirection();
+    testWouldCreateOverline();
     printf("Finished runGameTests.\n");
 }
 

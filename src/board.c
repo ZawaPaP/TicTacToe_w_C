@@ -60,6 +60,7 @@ BOOL __isInBoardRange(int r, int c) {
     return FALSE;
 }
 
+
 BOOL __isSameLine(Board* board, lineInfo* line1, lineInfo* line2, int row, int col, int dx, int dy) {
     // Gapなしのラインが2種類以上あることはない。
     if (!line1->hasGap && !line2->hasGap) {

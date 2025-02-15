@@ -366,19 +366,87 @@ lineInfoArray __getTargetLengthLinesInDirection(Board *board, int row, int col, 
     return result;
 }
 
-    /* BOOL __isDoubleThree(Board *board, int x, int y) {
-        for (int d = 0; d < 4; d++)
-        {
-            int dx = 0, dy = 0;
-            switch(d) {
-                case 0: dx = 0; dy = 1; break;  // 横方向
-                case 1: dx = 1; dy = 0; break;  // 縦方向
-                case 2: dx = 1; dy = 1; break;  // 右斜め
-                case 3: dx = 1; dy = -1; break; // 左斜め
-            }
-        }
+// 3や4に見えて長連を作ってしまうラインかどうかを判定。
+BOOL __wouldCreateOverline(Board* board, int row, int col, int dx, int dy, char playerMark) {
+    board->cells[row][col] = playerMark;
+    
+    // dx, dyの正もしくは負方向に対して、連続する形でもう一つ石を置いたときに、
+    // どうしても連続する石が6を超えてしまう時は三や四とは見做されない。
 
-    } */
+    // 左右それぞれの方向で、連続する石の数を数える
+    int continuous[2] = {0, 0};         // gapまでの連続した石 [左, 右]
+    int continuousOverGap[2] = {0, 0};  // gap後の連続した石 [左, 右]
+    int filledGap[2] = {0, 0}; // 左右それぞれで、石を置けたかどうか
+
+    for (int dir = 0; dir <= 1; dir++) {  // dir: 0=左方向, 1=右方向
+        int tx = row + (dir == 0 ? -dx : dx);
+        int ty = col + (dir == 0 ? -dy : dy);
+        
+        while (__isInBoardRange(tx, ty)) {
+            if (board->cells[tx][ty] == playerMark) {
+                if (filledGap[dir] == 0) {
+                    continuous[dir]++;
+                } else {
+                    continuousOverGap[dir]++;
+                }
+            } 
+            else if (board->cells[tx][ty] == EMPTY_CELL) {
+                if (filledGap[dir] > 0) break;  // 2つ目のgapで終了
+                filledGap[dir]++;
+            }
+            else {
+                break;
+            }
+            
+            tx += (dir == 0 ? -dx : dx);
+            ty += (dir == 0 ? -dy : dy);
+        }
+    }
+    board->cells[row][col] = EMPTY_CELL;
+
+    printf("leftco: %d rightco: %d leftov: %d rightov: %d\n", continuous[0], continuous[1], continuousOverGap[0], continuousOverGap[1]);
+
+    int leftGapLength = continuousOverGap[0] + continuous[0] + continuous[1] + 1;
+    int rightGapLength = continuous[0] + continuous[1] + continuousOverGap[1] + 1;
+
+    if (filledGap[0] == 0 && filledGap[1] == 0) {
+        // 左右ともに石を置く場所がないため、FALSE
+        return FALSE;
+    }
+    else if (filledGap[0] == 0 || filledGap[1] == 0) {
+        // 石の置き方は1通りしかない。
+        return leftGapLength + rightGapLength - 1 >= 6;
+    }
+    else {
+        return leftGapLength >= 6 && rightGapLength >= 6;
+    }
+}
+
+lineInfoArray __getEffectiveLines(Board *board, int row, int col, lineInfoArray* candidates, int dx, int dy, char playerMark) {
+    lineInfoArray effectiveLines = {0};
+    
+    printf("Checking %d candidate lines for effectiveness in direction (%d,%d)\n", 
+           candidates->count, dx, dy);
+    
+    for (int i = 0; i < candidates->count; i++) {
+        lineInfo candidate = candidates->lines[i];
+        printf("\nChecking candidate line %d: startIdx=%d endIdx=%d hasGap=%d\n", 
+               i + 1, candidate.startIdx, candidate.endIdx, candidate.hasGap);
+        
+        // 長連チェック
+        if (__wouldCreateOverline(board, row, col, dx, dy, playerMark)) {
+            printf("Line would create overline\n");
+            continue;
+        }
+        
+        printf("Adding effective line: startIdx=%d endIdx=%d hasGap=%d\n", 
+               candidate.startIdx, candidate.endIdx, candidate.hasGap);
+        effectiveLines.lines[effectiveLines.count++] = candidate;
+    }
+    
+    printf("Found %d effective lines\n", effectiveLines.count);
+    return effectiveLines;
+}
 
 
 
