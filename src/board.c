@@ -121,39 +121,21 @@ lineInfoArray __getTargetLengthLinesInDirectionCandidates(Board *board, int row,
     lineInfoArray result = {0};
     board->cells[row][col] = playerMark;
 
-    // デバッグ用に盤面の状態を表示
-    printf("Searching lines of length %d at (%d,%d)\n", length, row, col);
-    printf("Current line state: ");
-    for (int j = -length; j <= length; j++) {
-        int x = row + (j * dx);
-        int y = col + (j * dy);
-        if (__isInBoardRange(x, y)) {
-            printf("%c", board->cells[x][y]);
-        } else {
-            printf("#");  // 盤面外
-        }
-    }
-    printf("\n");
-
     // length+1マスのウィンドウを1マスずつずらしながら探索
     for (int i = 0; i <= length; i++) {
         int stones = 0;
         BOOL gap = FALSE;
         BOOL isValid = TRUE;
         
-        printf("Window %d: [", i);
         // 現在のウィンドウ内の石を確認
         for (int j = i - length; j <= i; j++) {
             int x = row + (j * dx);
             int y = col + (j * dy);
 
             if (!__isInBoardRange(x, y)) {
-                printf("#");
                 isValid = FALSE;
                 break;
             }
-
-            printf("%c", board->cells[x][y]);
 
             if (board->cells[x][y] != playerMark && 
                 board->cells[x][y] != EMPTY_CELL) {
@@ -170,8 +152,6 @@ lineInfoArray __getTargetLengthLinesInDirectionCandidates(Board *board, int row,
                 gap = TRUE;
             }
         }
-        printf("] stones=%d gap=%d valid=%d\n", stones, gap, isValid);
-
         if (isValid && stones == length) {
             lineInfo line = {
                 .startIdx = i - length,
@@ -179,8 +159,6 @@ lineInfoArray __getTargetLengthLinesInDirectionCandidates(Board *board, int row,
                 .hasGap = gap
             };
             result.lines[result.count] = line;
-            printf("Found line %d: startIdx=%d endIdx=%d hasGap=%d\n", 
-                   result.count + 1, line.startIdx, line.endIdx, line.hasGap);
             result.count++;
         }
     }

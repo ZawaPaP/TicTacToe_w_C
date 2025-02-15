@@ -302,7 +302,6 @@ lineInfoArray __getTargetLengthLinesInDirection(Board *board, int row, int col, 
         
     lineInfoArray result = {0};
 
-    printf("%d candidates\n", candidates.count);
     for (int i = 0; i < candidates.count; i++)
     {
         lineInfo candidate = candidates.lines[i];
@@ -345,10 +344,6 @@ lineInfoArray __getTargetLengthLinesInDirection(Board *board, int row, int col, 
                 isValid = TRUE;
             }
         }
-
-
-        printf("Found line %d: startIdx=%d endIdx=%d hasGap=%d isValid=%d\n", 
-                result.count + 1, candidate.startIdx, candidate.endIdx, candidate.hasGap, isValid);
 
         if (isValid) {
             BOOL isDuplicate = FALSE;
