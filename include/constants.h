@@ -89,6 +89,6 @@ typedef struct {
 typedef struct {
     LineIdx lines[2];  // 最大2パターンを格納
     int pattern; // 見つかったパターンの数（1または2）
-} LineLengthPattern;
+} LinePatterns;
 
 #endif

@@ -57,8 +57,8 @@ static int countContinuousStones(Board *board, int r, int c, int dx, int dy, cha
 }
 
 // 特定の方向の連続した石を1つのGAPありで数える
-LineLengthPattern countContinuousStonesWithGap(Board *board, int r, int c, int dx, int dy, char playerMark) {
-    LineLengthPattern result = {.pattern = 0};
+LinePatterns countContinuousStonesWithGap(Board *board, int r, int c, int dx, int dy, char playerMark) {
+    LinePatterns result = {.pattern = 0};
     for (int gapSide = 0; gapSide <= 1; gapSide++) {  // 0:左側, 1:右側
         int minIdx = 0, maxIdx = 0;
         int length = 1;  // 置いた石から開始
@@ -143,6 +143,30 @@ BOOL isMakingOverLine(Board *board, int r, int c, char playerMark) {
     return FALSE;
 }
 
+// 両側が空いているラインかどうかを確認
+BOOL isOpenLine(Board *board, Cell start, Cell end, Direction dir) {
+
+    // 両サイドが盤面外の場合
+    if (!isInBoard(start.r - dir.dx, start.c - dir.dy) || !isInBoard(end.r + dir.dx, end.c + dir.dy))
+        return FALSE;
+
+    return (
+        board->cells[start.r - dir.dx][start.c - dir.dy] == EMPTY_CELL && 
+        board->cells[end.r + dir.dx][end.c + dir.dy] == EMPTY_CELL
+    );
+}
+
+BOOL isHalfOpenLine(Board *board, Cell start, Cell end, Direction dir) {
+
+    // 両サイドが盤面外の場合
+    if (!isInBoard(start.r - dir.dx, start.c - dir.dy) && !isInBoard(end.r + dir.dx, end.c + dir.dy))
+        return FALSE;
+
+    return (
+        !isOpenLine(board, start, end, dir) && (board->cells[start.r - dir.dx][start.c - dir.dy] == EMPTY_CELL ||
+                                                board->cells[end.r + dir.dx][end.c + dir.dy] == EMPTY_CELL));
+}
+
 /* BOOL isMakingDoubleThreeOrDoubleFour(Board *board, int r, int c, char playerMark) {
     if (playerMark != PLAYER_X)
         return FALSE;
@@ -153,18 +177,17 @@ BOOL isMakingOverLine(Board *board, int r, int c, char playerMark) {
     return FALSE;
 } */
 
-/* 
-BOOL isEffectiveThree(Board *board, int row, int col, int dx, int dy, LineInfo line) {
+
+
+/* BOOL isEffectiveThree(Board *board, int row, int col, int dx, int dy, char playerMark) {
     // 3として有効であるかどうかの判定 => 4を作ったときに次に置く場所が塞がれておらず、禁じ手にもなっていない
     // そういった4を作れるかどうかを確認する
+    LinePatterns lines;
+    lines = countContinuousStonesWithGap(board, row, col, dx, dy, playerMark);
 
-    // 石の両サイドが空いていることは確認済み
-    
+    // ラインの両サイドが空いていることを確認。
 
-    if (line.hasGap) {
-        // もし飛び3の場合、そのgapに石を置くことができるか (禁じ手となっていないか)
-        continue;
-    }
+    // もし飛び3の場合、そのgapに石を置くことができるか (禁じ手となっていないか)
 
     // gapがない場合は、両サイドの少なくとも一方が2マス分空いているか
     // 有効な3の例: __XXX__, O_XXX__

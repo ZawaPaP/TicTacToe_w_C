@@ -490,7 +490,7 @@ void testCountContinuousStonesWithGap() {
     };
     
     initBoardWithStr(&board, testBoard1);
-    LineLengthPattern result1 = countContinuousStonesWithGap(&board, 2, 4, 0, 1, PLAYER_X);
+    LinePatterns result1 = countContinuousStonesWithGap(&board, 2, 4, 0, 1, PLAYER_X);
     assert(result1.pattern == 2);
     assert(result1.lines[0].start.r == 2);
     assert(result1.lines[0].start.c == 1);
@@ -519,7 +519,7 @@ void testCountContinuousStonesWithGap() {
     };
     
     initBoardWithStr(&board, testBoard2);
-    LineLengthPattern result2 = countContinuousStonesWithGap(&board, 2, 4, 0, 1, PLAYER_X);
+    LinePatterns result2 = countContinuousStonesWithGap(&board, 2, 4, 0, 1, PLAYER_X);
     assert(result2.pattern == 1);
     assert(result2.lines[0].start.r == 2);
     assert(result2.lines[0].start.c == 3);
@@ -544,7 +544,7 @@ void testCountContinuousStonesWithGap() {
     };
     
     initBoardWithStr(&board, testBoard3);
-    LineLengthPattern result3 = countContinuousStonesWithGap(&board, 2, 4, 0, 1, PLAYER_X);
+    LinePatterns result3 = countContinuousStonesWithGap(&board, 2, 4, 0, 1, PLAYER_X);
     assert(result3.pattern == 1);
     assert(result3.lines[0].start.r == 2);
     assert(result3.lines[0].start.c == 1);
@@ -555,6 +555,129 @@ void testCountContinuousStonesWithGap() {
     
 
     printf("All testCountContinuousStonesWithGap passed!\n");
+}
+
+void testIsOpenLine() {
+    Board board;
+
+    printf("Start testIsOpenLine...\n");
+
+    const char *testBoard1[] = {
+            NULL,
+            ".........",
+            "..XXX....", 
+            ".......X.",
+            "..X...X..",
+            "..X......",
+            ".....X...",
+            "......X..",
+            ".......X.",
+            "........."
+        };
+    initBoardWithStr(&board, testBoard1);
+    Cell start1 = {.r = 2, .c = 3};
+    Cell end1 = {.r = 2, .c = 5};
+    Direction dir1 = {.dx = 0, .dy = 1};
+
+    Cell start2 = {.r = 4, .c = 3};
+    Cell end2 = {.r = 5, .c = 3};
+    Direction dir2 = {.dx = 1, .dy = 0};
+
+    Cell start3 = {.r = 3, .c = 8};
+    Cell end3 = {.r = 4, .c = 7};
+    Direction dir3 = {.dx = 1, .dy = -1};
+
+    Cell start4 = {.r = 6, .c = 6};
+    Cell end4 = {.r = 8, .c = 8};
+    Direction dir4 = {.dx = 1, .dy = 1};
+
+    assert(isOpenLine(&board, start1, end1, dir1) == TRUE);
+    assert(isOpenLine(&board, start2, end2, dir2) == TRUE);
+    assert(isOpenLine(&board, start3, end3, dir3) == TRUE);
+    assert(isOpenLine(&board, start4, end4, dir4) == TRUE);
+
+
+    const char *testBoard2[] = {
+            NULL,
+            ".........",
+            "XXXX....X", 
+            ".......X.",
+            "..X...X..",
+            "..X......",
+            "..O..X...",
+            "......X..",
+            ".......X.",
+            "........O"
+        };
+    initBoardWithStr(&board, testBoard2);
+    Cell start5 = {.r = 2, .c = 1};
+    Cell end5 = {.r = 2, .c = 4};
+    Direction dir5 = {.dx = 0, .dy = 1};
+
+    Cell start6 = {.r = 4, .c = 3};
+    Cell end6 = {.r = 5, .c = 3};
+    Direction dir6 = {.dx = 1, .dy = 0};
+
+    Cell start7 = {.r = 2, .c = 9};
+    Cell end7 = {.r = 4, .c = 7};
+    Direction dir7 = {.dx = 1, .dy = -1};
+
+    Cell start8 = {.r = 6, .c = 6};
+    Cell end8 = {.r = 8, .c = 8};
+    Direction dir8 = {.dx = 1, .dy = 1};
+
+    assert(isOpenLine(&board, start5, end5, dir5) == FALSE);
+    assert(isOpenLine(&board, start6, end6, dir6) == FALSE);
+    assert(isOpenLine(&board, start7, end7, dir7) == FALSE);
+    assert(isOpenLine(&board, start8, end8, dir8) == FALSE);
+
+    printf("All testIsOpenLine passed!\n");
+
+}
+
+
+
+void testIsHalfOpenLine() {
+    Board board;
+
+    printf("Start testIsHalfOpenLine...\n");
+
+    const char *testBoard1[] = {
+            NULL,
+            ".........",
+            ".OXXX...X", 
+            "..O....X.",
+            "..X...X..",
+            "..X......",
+            "..O..X...",
+            "......X..",
+            ".......X.",
+            "........."
+        };
+    initBoardWithStr(&board, testBoard1);
+    Cell start1 = {.r = 2, .c = 3};
+    Cell end1 = {.r = 2, .c = 5};
+    Direction dir1 = {.dx = 0, .dy = 1};
+
+    Cell start2 = {.r = 4, .c = 3};
+    Cell end2 = {.r = 5, .c = 3};
+    Direction dir2 = {.dx = 1, .dy = 0};
+
+    Cell start3 = {.r = 2, .c = 9};
+    Cell end3 = {.r = 4, .c = 7};
+    Direction dir3 = {.dx = 1, .dy = -1};
+
+    Cell start4 = {.r = 6, .c = 6};
+    Cell end4 = {.r = 8, .c = 8};
+    Direction dir4 = {.dx = 1, .dy = 1};
+
+    assert(isHalfOpenLine(&board, start1, end1, dir1) == TRUE);
+    assert(isHalfOpenLine(&board, start2, end2, dir2) == FALSE);
+    assert(isHalfOpenLine(&board, start3, end3, dir3) == TRUE);
+    assert(isHalfOpenLine(&board, start4, end4, dir4) == FALSE);
+
+    printf("All testIsHalfOpenLine passed!\n");
+
 }
 
 void testIsEffectiveThree() {
@@ -593,5 +716,7 @@ void runBoardTests() {
     testGetTargetLengthLinesInDirection();
     testWouldCreateOverline();
     testCountContinuousStonesWithGap();
+    testIsOpenLine();
+    testIsHalfOpenLine();
     printf("Finished runBoardTests.\n");
 }
