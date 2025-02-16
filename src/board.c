@@ -36,33 +36,46 @@ BOOL isInBoard(int r, int c) {
     return FALSE;
 }
 
-
-
+// 特定の方向の連続した石の数を数える共通関数
+static int countContinuousStones(Board *board, int r, int c, int dx, int dy, char playerMark) {
+    int length = 1;  // 置いた石から開始
+    
+    // 両方向（正負）に探索
+    for (int reverse = 0; reverse <= 1; reverse++) {
+        int nextX = r + (reverse == 0 ? -dx : dx);
+        int nextY = c + (reverse == 0 ? -dy : dy);
+        
+        while (isInBoard(nextX, nextY) && board->cells[nextX][nextY] == playerMark) {
+            length++;
+            nextX += (reverse == 0 ? -dx : dx);
+            nextY += (reverse == 0 ? -dy : dy);
+        }
+    }
+    
+    return length;
+}
 
 BOOL isWinMove(Board *board, int r, int c, char playerMark) {
     if (playerMark == EMPTY_CELL)
         return FALSE;
-
+        
     for (int dir = 0; dir < dirLength; dir++) {
-        int dx = DIRS[dir].dx;
-        int dy = DIRS[dir].dy;
-        int length = 1;
-
-        for (int reverse = 0; reverse <= 1; reverse++) {
-            int nextX = r + (reverse == 0 ? -dx : dx);
-            int nextY = c + (reverse == 0 ? -dy : dy);
-
-            while (isInBoard(nextX, nextY)) {
-                if (board->cells[nextX][nextY] == playerMark) {
-                    length++;
-                    nextX += (reverse == 0 ? -dx : dx);
-                    nextY += (reverse == 0 ? -dy : dy);
-                }
-                else
-                    break;
-            }
-        }
+        int length = countContinuousStones(board, r, c, DIRS[dir].dx, DIRS[dir].dy, playerMark);
+        
         if ((playerMark == PLAYER_O && length >= 5) || length == 5)
+            return TRUE;
+    }
+    return FALSE;
+}
+
+BOOL isMakingOverLine(Board *board, int r, int c, char playerMark) {
+    if (playerMark != PLAYER_X)
+        return FALSE;
+        
+    for (int dir = 0; dir < dirLength; dir++) {
+        int length = countContinuousStones(board, r, c, DIRS[dir].dx, DIRS[dir].dy, playerMark);
+        
+        if (length >= 6)
             return TRUE;
     }
     return FALSE;

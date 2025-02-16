@@ -112,6 +112,50 @@ void testIsWinMove() {
 }
 
 
+void testIsMakingOverLine() {
+    printf("Start testIsMakingOverLine...\n");
+
+    Board board;
+
+    // 横に5つ並んでいる
+    const char *testBoard1[] = {
+        NULL,
+        ".........",
+        ".XXXXX@..",
+        ".........",
+        ".........",
+        ".........",
+        ".........",
+        ".........",
+        ".........",
+        "O@OOOO..."
+    };
+    
+    initBoardWithStr(&board, testBoard1);
+    assert(isMakingOverLine(&board, 2, 7, PLAYER_X) == TRUE);
+    assert(isMakingOverLine(&board, 9, 2, PLAYER_O) == FALSE);
+
+    const char *testBoard2[] = {
+        NULL,
+        ".........",
+        "X........",
+        "X........",
+        "X..X.....",
+        "@...X....",
+        "X....X...",
+        "X.....X..",
+        ".......X.",
+        "........@"
+    };
+    
+    initBoardWithStr(&board, testBoard2);
+    assert(isMakingOverLine(&board, 5, 1, PLAYER_X) == TRUE);
+    assert(isMakingOverLine(&board, 9, 9, PLAYER_X) == TRUE);
+
+    printf("Success testIsMakingOverLine.\n");
+}
+
+
 void testIsSameLine() {
     Board board;
     printf("Start testIsSameLine...\n");
@@ -470,6 +514,7 @@ void runBoardTests() {
     printf("Start runBoardTests...\n");
     testInitBoard();
     testIsWinMove();
+    testIsMakingOverLine();
     testIsSameLine();
     testGetTargetLengthLinesInDirection();
     testWouldCreateOverline();
