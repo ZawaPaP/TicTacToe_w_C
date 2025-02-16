@@ -65,11 +65,17 @@ typedef struct {
     int startIdx;
     int endIdx;
     BOOL hasGap;
-} lineInfo;
+} LineInfo;
 
 typedef struct {
-    lineInfo lines[10];
+    LineInfo lines[10];
     int count;
-} lineInfoArray;
+} LineInfoArray;
+
+// gap込みで長さを測ると、gapの位置によって、同じラインが最大２パターンの長さを持つ。
+typedef struct {
+    int lengths[2];  // 異なる長さのパターンを格納
+    int pattern;       // 見つかったパターンの数（1または2）
+} LineLengthPattern;
 
 #endif

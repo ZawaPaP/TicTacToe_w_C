@@ -176,8 +176,8 @@ void testIsSameLine() {
     
     initBoardWithStr(&board, testBoard1);
 
-    lineInfo line1 = {.startIdx = -2, .endIdx = 1, .hasGap = FALSE};
-    lineInfo line2 = {.startIdx = -1, .endIdx = 2, .hasGap = FALSE};
+    LineInfo line1 = {.startIdx = -2, .endIdx = 1, .hasGap = FALSE};
+    LineInfo line2 = {.startIdx = -1, .endIdx = 2, .hasGap = FALSE};
     
     // 横方向（dx=0, dy=1）で比較
     assert(__isSameLine(&board, &line1, &line2, 2, 5, 0, 1) == TRUE);
@@ -198,8 +198,8 @@ void testIsSameLine() {
     
     initBoardWithStr(&board, testBoard2);
     
-    lineInfo line3 = {.startIdx = -1, .endIdx = 2, .hasGap = FALSE};
-    lineInfo line4 = {.startIdx = -2, .endIdx = 1, .hasGap = FALSE};
+    LineInfo line3 = {.startIdx = -1, .endIdx = 2, .hasGap = FALSE};
+    LineInfo line4 = {.startIdx = -2, .endIdx = 1, .hasGap = FALSE};
     
     // 斜め方向（dx=1, dy=1）で比較
     assert(__isSameLine(&board, &line3, &line4, 3, 5, 1, 1) == TRUE);
@@ -220,8 +220,8 @@ void testIsSameLine() {
     
     initBoardWithStr(&board, testBoard3);
     
-    lineInfo line5 = {.startIdx = -4, .endIdx = 0, .hasGap = TRUE};
-    lineInfo line6 = {.startIdx = -3, .endIdx = 1, .hasGap = TRUE};
+    LineInfo line5 = {.startIdx = -4, .endIdx = 0, .hasGap = TRUE};
+    LineInfo line6 = {.startIdx = -3, .endIdx = 1, .hasGap = TRUE};
     
     assert(__isSameLine(&board, &line5, &line6, 2, 7, 0, 1) == TRUE);
 
@@ -242,8 +242,8 @@ void testIsSameLine() {
     
     initBoardWithStr(&board, testBoard4);
     
-    lineInfo line7 = {.startIdx = -3, .endIdx = 0, .hasGap = TRUE};
-    lineInfo line8 = {.startIdx = 0, .endIdx = 3, .hasGap = TRUE};
+    LineInfo line7 = {.startIdx = -3, .endIdx = 0, .hasGap = TRUE};
+    LineInfo line8 = {.startIdx = 0, .endIdx = 3, .hasGap = TRUE};
     
     assert(__isSameLine(&board, &line7, &line8, 2, 5, 0, 1) == FALSE);
 
@@ -252,7 +252,7 @@ void testIsSameLine() {
 
 void testGetTargetLengthLinesInDirection() {
     Board board;
-    lineInfoArray candidateResult, result;
+    LineInfoArray candidateResult, result;
 
     printf("Start testGetTargetLengthLinesInDirection...\n");
 
@@ -366,7 +366,7 @@ void testGetTargetLengthLinesInDirection() {
     assert(candidateResult.lines[0].endIdx == 0);
     assert(candidateResult.lines[0].hasGap == TRUE);
 
-    lineInfoArray result1 = __getTargetLengthLinesInDirection(&board, 3, 5, 3, 0, 1, PLAYER_X);
+    LineInfoArray result1 = __getTargetLengthLinesInDirection(&board, 3, 5, 3, 0, 1, PLAYER_X);
     assert(result1.count == 0);  // 候補なし
 
     candidateResult = __getTargetLengthLinesInDirectionCandidates(&board, 9, 6, 3, 0, 1, PLAYER_X);
@@ -376,7 +376,7 @@ void testGetTargetLengthLinesInDirection() {
     assert(candidateResult.lines[0].endIdx == 3);
     assert(candidateResult.lines[0].hasGap == TRUE);
 
-    lineInfoArray result2 = __getTargetLengthLinesInDirection(&board, 9, 6, 3, 0, 1, PLAYER_X);
+    LineInfoArray result2 = __getTargetLengthLinesInDirection(&board, 9, 6, 3, 0, 1, PLAYER_X);
     assert(result2.count == 0);  // 候補なし
 
     // テストケース5: lengthを超えるケース
@@ -470,45 +470,100 @@ void testWouldCreateOverline() {
 
 }
 
-/* void testIsThree(){
-    assert(__getTargetLengthLinesInDirection("..XX@..", 5) == TRUE);  // @の場所に石を置いたら三になる
-    assert(__getTargetLengthLinesInDirection("..@XX..", 3) == TRUE);  // @の場所に石を置いたら三になる
-    assert(__getTargetLengthLinesInDirection("..X@X..", 4) == TRUE);  // @を含めて三つ並んでいる
-    assert(__getTargetLengthLinesInDirection("..XX.@.", 6) == TRUE);  // @の場所に石を置いたら飛び三になる
-    assert(__getTargetLengthLinesInDirection(".@.XX..", 2) == TRUE);  // @の場所に石を置いたら飛び三になる
-    assert(__getTargetLengthLinesInDirection("..X@.X.", 4) == TRUE);  // @の場所に石を置いたら飛び三になる
-    assert(__getTargetLengthLinesInDirection(".X@.X.O", 3) == TRUE);  // @の場所に石を置いたら飛び三になる
 
-    assert(__getTargetLengthLinesInDirection(".X.@.X.", 4) == FALSE);  // @の場所に石を置いても三にならない
-    assert(__getTargetLengthLinesInDirection(".XX@.X.", 4) == FALSE);  // @の場所に石を置いたら四になるため、三にならない
-    assert(__getTargetLengthLinesInDirection("XX@....", 3) == FALSE);  // @の場所に石を置いたら四になるため、三にならない
-    assert(__getTargetLengthLinesInDirection(".OX@.X.", 4) == FALSE);  // 2の場所に、他の石があるため、三にならない
-    assert(__getTargetLengthLinesInDirection("..X@.XO", 4) == FALSE);  // 7の場所に、他の石があるため、三にならない
-    assert(__getTargetLengthLinesInDirection("O.X@X.O", 4) == FALSE);  // 1, 7の場所に、他の石があるため、三にならない
-    assert(__getTargetLengthLinesInDirection(".X@X.O.", 3) == FALSE);  // 左が壁となり白が止めることができるため、三にならない
-
-
-} */
-
-
-void testSimpleProhibitedDoubleThree(){
+void testCountContinuousStonesWithGap() {
     Board board;
-    // {4, 3}, {4, 7}, {9, 7} は3x3を作る禁じ手
-    const char *lines[] = {
+    printf("Start testCountContinuousStonesWithGap...\n");
+    
+    // テストケース1: 左右方向に2種類のラインができるケース
+    const char *testBoard1[] = {
         NULL,
         ".........",
-        "..X......",
-        "..X......",
-        "..@XX.@..",
-        "........",
-        "......X..",
-        "......X..",
+        "X.X@.X...",
         ".........",
-        ".....X@X."
+        ".........",
+        ".........",
+        ".........",
+        ".........",
+        ".........",
+        "........."
     };
-    initBoardWithStr(&board, lines);
+    
+    initBoardWithStr(&board, testBoard1);
+    LineLengthPattern result1 = countContinuousStonesWithGap(&board, 2, 4, 0, 1, PLAYER_X);
+    assert(result1.pattern == 2);
+    assert(result1.lengths[0] == 3);
+    assert(result1.lengths[1] == 3);
+    
+    // テストケース2: 1種類のみのケース (gapなし)
+    const char *testBoard2[] = {
+        NULL,
+        ".........",
+        "..X@X....",
+        ".........",
+        ".........",
+        ".........",
+        ".........",
+        ".........",
+        ".........",
+        "........."
+    };
+    
+    initBoardWithStr(&board, testBoard2);
+    LineLengthPattern result2 = countContinuousStonesWithGap(&board, 2, 4, 0, 1, PLAYER_X);
+    assert(result2.pattern == 1);
+    assert(result2.lengths[0] == 3);
+    
+
+        // テストケース3: 片側にしかgapがないケース
+    const char *testBoard3[] = {
+        NULL,
+        ".........",
+        "XXX@.X..",
+        ".........",
+        ".........",
+        ".........",
+        ".........",
+        ".........",
+        ".........",
+        "........."
+    };
+    
+    initBoardWithStr(&board, testBoard3);
+    LineLengthPattern result3 = countContinuousStonesWithGap(&board, 2, 4, 0, 1, PLAYER_X);
+    assert(result3.pattern == 1);
+    assert(result3.lengths[0] == 5);
+    
+
+    printf("All testCountContinuousStonesWithGap passed!\n");
 }
 
+void testIsEffectiveThree() {
+    Board board;
+
+    printf("Start testIsEffectiveThree...\n");
+
+    // @に石を置くと、4x4に見えるが、横の列は完成させると長連を作るため、
+    // 横の列は完成させることができず4と見做されない。
+    const char *testBoard1[] = {
+            NULL,
+            ".........",
+            "..@XX...", 
+            "..X......",
+            "..X......",
+            ".........",
+            ".........",
+            ".........",
+            ".........",
+            "........."
+        };
+    initBoardWithStr(&board, testBoard1);
+    assert(__wouldCreateOverline(&board, 2, 3, 0, 1, PLAYER_X) == TRUE);
+
+
+    printf("All testIsEffectiveThree passed!\n");
+
+}
 
 void runBoardTests() {
     printf("Start runBoardTests...\n");
@@ -518,5 +573,6 @@ void runBoardTests() {
     testIsSameLine();
     testGetTargetLengthLinesInDirection();
     testWouldCreateOverline();
+    testCountContinuousStonesWithGap();
     printf("Finished runBoardTests.\n");
 }

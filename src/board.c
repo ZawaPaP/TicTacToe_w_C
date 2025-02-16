@@ -55,6 +55,63 @@ static int countContinuousStones(Board *board, int r, int c, int dx, int dy, cha
     return length;
 }
 
+// 特定の方向の連続した石を1つのGAPありで数える
+LineLengthPattern countContinuousStonesWithGap(Board *board, int r, int c, int dx, int dy, char playerMark) {
+    LineLengthPattern result = {.pattern = 0, .lengths = {0, 0}};
+    for (int gapSide = 0; gapSide <= 1; gapSide++) {  // 0:左側, 1:右側
+        int length = 1;  // 置いた石から開始
+        BOOL gapUsed = FALSE;
+
+        for (int reverse = 0; reverse <= 1; reverse++) {
+            int nextX = r + (reverse == 0 ? -dx : dx);
+            int nextY = c + (reverse == 0 ? -dy : dy);
+            
+            while (isInBoard(nextX, nextY)) {
+                printf("nextX %d nextY %d \n", nextX, nextY);
+                if (board->cells[nextX][nextY] == playerMark)
+                {
+                    length++;
+                // 意図した方向のgapの場合は、有効なgapかどうかをチェック。
+                }
+                else if (!gapUsed &&
+                         board->cells[nextX][nextY] == EMPTY_CELL &&
+                         ((gapSide == 0 && reverse == 0) || (gapSide == 1 && reverse == 1)))
+                {
+                    // gapをまだ1度も通っておらず、gapの次の石が自分の石の場合、数え続ける。
+                    //　その他の場合は、数えるのをやめる。
+                    nextX += (reverse == 0 ? -dx : dx);
+                    nextY += (reverse == 0 ? -dy : dy);
+                    if (isInBoard(nextX, nextY) && board->cells[nextX][nextY] == playerMark) {
+                        gapUsed = TRUE;
+                        continue;
+                    } else
+                        break;
+                }
+                else
+                {
+                    break;
+                }
+                nextX += (reverse == 0 ? -dx : dx);
+                nextY += (reverse == 0 ? -dy : dy);
+            }
+        }
+        printf("gapUsed %d pattern %d length %d\n", gapUsed, result.pattern, length);
+
+        // gapを使っている場合、新しい長さとして保存
+        // gapを使っていない場合、両サイドともgapがない場合に限り1度だけ保存
+        // 片側のみgapがあるのは、長さパターン1つとなる
+        if (gapUsed)
+        {
+            result.lengths[result.pattern] = (length > result.lengths[result.pattern] ? length : result.lengths[result.pattern]);
+            result.pattern++;
+        } else if (result.pattern == 0 && gapSide == 1) {
+            result.lengths[result.pattern] = (length > result.lengths[result.pattern] ? length : result.lengths[result.pattern]);
+            result.pattern++;
+        }
+    }
+    return result;
+}
+
 BOOL isWinMove(Board *board, int r, int c, char playerMark) {
     if (playerMark == EMPTY_CELL)
         return FALSE;
@@ -81,7 +138,38 @@ BOOL isMakingOverLine(Board *board, int r, int c, char playerMark) {
     return FALSE;
 }
 
-BOOL __isSameLine(Board* board, lineInfo* line1, lineInfo* line2, int row, int col, int dx, int dy) {
+/* BOOL isMakingDoubleThreeOrDoubleFour(Board *board, int r, int c, char playerMark) {
+    if (playerMark != PLAYER_X)
+        return FALSE;
+        
+    for (int dir = 0; dir < dirLength; dir++) {
+        
+    }
+    return FALSE;
+} */
+
+/* 
+BOOL isEffectiveThree(Board *board, int row, int col, int dx, int dy, LineInfo line) {
+    // 3として有効であるかどうかの判定 => 4を作ったときに次に置く場所が塞がれておらず、禁じ手にもなっていない
+    // そういった4を作れるかどうかを確認する
+
+    // 石の両サイドが空いていることは確認済み
+    
+
+    if (line.hasGap) {
+        // もし飛び3の場合、そのgapに石を置くことができるか (禁じ手となっていないか)
+        continue;
+    }
+
+    // gapがない場合は、両サイドの少なくとも一方が2マス分空いているか
+    // 有効な3の例: __XXX__, O_XXX__
+    // 有効ではない3の例: O_XXX_O
+
+
+} */
+
+
+BOOL __isSameLine(Board* board, LineInfo* line1, LineInfo* line2, int row, int col, int dx, int dy) {
     // Gapなしのラインが2種類以上あることはない。
     if (!line1->hasGap && !line2->hasGap) {
         return TRUE;
@@ -126,7 +214,7 @@ BOOL __isSameLine(Board* board, lineInfo* line1, lineInfo* line2, int row, int c
 }
 
 
-lineInfoArray __getTargetLengthLinesInDirectionCandidates(Board *board, int row, int col, int length, int dx, int dy, char playerMark) {
+LineInfoArray __getTargetLengthLinesInDirectionCandidates(Board *board, int row, int col, int length, int dx, int dy, char playerMark) {
     /*
     T: target 石を置く場所
     としたときに、長さlengthのラインであれば、lineInfoをarrayで返す
@@ -139,7 +227,7 @@ lineInfoArray __getTargetLengthLinesInDirectionCandidates(Board *board, int row,
            T___
         }
     */
-    lineInfoArray result = {0};
+    LineInfoArray result = {0};
     board->cells[row][col] = playerMark;
 
     // length+1マスのウィンドウを1マスずつずらしながら探索
@@ -174,7 +262,7 @@ lineInfoArray __getTargetLengthLinesInDirectionCandidates(Board *board, int row,
             }
         }
         if (isValid && stones == length) {
-            lineInfo line = {
+            LineInfo line = {
                 .startIdx = i - length,
                 .endIdx = i,
                 .hasGap = gap
@@ -189,7 +277,7 @@ lineInfoArray __getTargetLengthLinesInDirectionCandidates(Board *board, int row,
 }
 
 
-lineInfoArray __getTargetLengthLinesInDirection(Board *board, int row, int col, int length, int dx, int dy, char playerMark) {
+LineInfoArray __getTargetLengthLinesInDirection(Board *board, int row, int col, int length, int dx, int dy, char playerMark) {
     /*
     dx, dy方向にちょうどlengthの長さと見做せるlineのlineInfoをarrayで返す。
     前提: 複数存在するケースもある。
@@ -208,13 +296,13 @@ lineInfoArray __getTargetLengthLinesInDirection(Board *board, int row, int col, 
                 _|X_XT|_,
                 _|XT_X|_,
     */
-    lineInfoArray candidates = __getTargetLengthLinesInDirectionCandidates(board, row, col, length, dx, dy, playerMark);
+    LineInfoArray candidates = __getTargetLengthLinesInDirectionCandidates(board, row, col, length, dx, dy, playerMark);
         
-    lineInfoArray result = {0};
+    LineInfoArray result = {0};
 
     for (int i = 0; i < candidates.count; i++)
     {
-        lineInfo candidate = candidates.lines[i];
+        LineInfo candidate = candidates.lines[i];
         BOOL isValid = FALSE;
         
         // ラインの両端の外側をチェック
@@ -329,29 +417,46 @@ BOOL __wouldCreateOverline(Board* board, int row, int col, int dx, int dy, char 
         return leftGapLength >= 6 && rightGapLength >= 6;
     }
 }
+/* 
+BOOL isForbiddenMove(Board *board, int row, int col, char playerMark) {
 
-lineInfoArray __getEffectiveLines(Board *board, int row, int col, lineInfoArray* candidates, int dx, int dy, char playerMark) {
-    lineInfoArray effectiveLines = {0};
-    
-    printf("Checking %d candidate lines for effectiveness in direction (%d,%d)\n", 
-           candidates->count, dx, dy);
-    
-    for (int i = 0; i < candidates->count; i++) {
-        lineInfo candidate = candidates->lines[i];
-        printf("\nChecking candidate line %d: startIdx=%d endIdx=%d hasGap=%d\n", 
-               i + 1, candidate.startIdx, candidate.endIdx, candidate.hasGap);
-        
-        // 長連チェック
-        if (__wouldCreateOverline(board, row, col, dx, dy, playerMark)) {
-            printf("Line would create overline\n");
-            continue;
-        }
-        
-        printf("Adding effective line: startIdx=%d endIdx=%d hasGap=%d\n", 
-               candidate.startIdx, candidate.endIdx, candidate.hasGap);
-        effectiveLines.lines[effectiveLines.count++] = candidate;
+    // 黒の手番のみチェック
+    if (playerMark != PLAYER_X) {
+        return FALSE;
     }
     
-    printf("Found %d effective lines\n", effectiveLines.count);
-    return effectiveLines;
+    // 勝利する手なら問題ない
+    if (isWinMove(board, row, col, playerMark)) {
+        return FALSE;
+    }
+
+    // 長連がある場合、禁じ手
+    if (isMakingOverLine(board, row, col, playerMark)) {
+        return TRUE;
+    }
+
+
+    // 上記以外の場合、有効な3, 4の数を調べる
+    // 有効とは、相手が最善手を打っても、5を作ることを防げないライン。
+    // そのため、片側が壁や石で塞がれているなど、防ぐことができるラインや、
+    // 禁じ手となるためラインを伸ばせない状態は有効とは見做されず、3x3,4x4の対象とならない。
+
+    board->cells[row][col] = playerMark;
+    
+    int effectiveThrees = 0;
+    int effectiveFours = 0;
+    
+    // 4方向それぞれについて、3と4のラインを探し、有効なものをカウント
+    for (int i = 0; i < 4; i++) {
+        // 3のライン
+        LineInfoArray threeLines = __getTargetLengthLinesInDirection(
+            board, row, col, 3, DIRS[i].dx, DIRS[i].dy, playerMark
+        );
+    }
+    
+    board->cells[row][col] = EMPTY_CELL;
+    
+    // 3x3または4x4の判定
+    return (effectiveThrees >= 2 || effectiveFours >= 2);
 }
+ */
