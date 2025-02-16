@@ -32,8 +32,22 @@ void testInitBoardWithStr() {
     assert(board.cells[9][9] == PLAYER_X);
 }
 
+void testMax() {
+    int x, y;
+    x = 10;
+    y = 3;
+    assert(max(x, y) == x);
+
+    x = -19;
+    y = 3;
+    assert(max(x, y) == y);
+}
+
+
+
 void runUtilsTests(){
     printf("Start runUtilsTests...\n");
+    testMax();
     testInitBoardWithStr();
     printf("Finished runUtilsTests.\n");
 }

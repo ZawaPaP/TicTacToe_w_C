@@ -31,3 +31,12 @@ void initBoardWithStr(Board *board, const char *lines[BOARD_ROWS + 1]) {
     }
 }
 
+
+int min(int a, int b) {
+    return (a < b) ? a : b;
+}
+
+// 2つの整数の最大値を返す
+int max(int a, int b) {
+    return (a > b) ? a : b;
+}

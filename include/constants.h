@@ -55,11 +55,24 @@ typedef enum
     CLOSED = 2
 } EDGE_STATUS;
 
-// 方向を表す構造体
 typedef struct {
+    int r;
+    int c;
+} Cell;
+
+// 方向を表す構造体
+typedef struct
+{
     int dx;  // x方向の変化量
     int dy;  // y方向の変化量
 } Direction;
+
+typedef struct {
+    Cell start;
+    Cell end;
+    int length;
+    Direction dir[2];
+} LineIdx;
 
 typedef struct {
     int startIdx;
@@ -74,8 +87,8 @@ typedef struct {
 
 // gap込みで長さを測ると、gapの位置によって、同じラインが最大２パターンの長さを持つ。
 typedef struct {
-    int lengths[2];  // 異なる長さのパターンを格納
-    int pattern;       // 見つかったパターンの数（1または2）
+    LineIdx lines[2];  // 最大2パターンを格納
+    int pattern; // 見つかったパターンの数（1または2）
 } LineLengthPattern;
 
 #endif

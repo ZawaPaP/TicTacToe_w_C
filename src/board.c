@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "utils.h"
 #include "board.h"
 
 static const Direction DIRS[4] = {
@@ -57,20 +58,23 @@ static int countContinuousStones(Board *board, int r, int c, int dx, int dy, cha
 
 // 特定の方向の連続した石を1つのGAPありで数える
 LineLengthPattern countContinuousStonesWithGap(Board *board, int r, int c, int dx, int dy, char playerMark) {
-    LineLengthPattern result = {.pattern = 0, .lengths = {0, 0}};
+    LineLengthPattern result = {.pattern = 0};
     for (int gapSide = 0; gapSide <= 1; gapSide++) {  // 0:左側, 1:右側
+        int minIdx = 0, maxIdx = 0;
         int length = 1;  // 置いた石から開始
         BOOL gapUsed = FALSE;
 
         for (int reverse = 0; reverse <= 1; reverse++) {
             int nextX = r + (reverse == 0 ? -dx : dx);
             int nextY = c + (reverse == 0 ? -dy : dy);
+            int relativePos = (reverse == 0 ? -1 : 1);
             
             while (isInBoard(nextX, nextY)) {
-                printf("nextX %d nextY %d \n", nextX, nextY);
                 if (board->cells[nextX][nextY] == playerMark)
                 {
                     length++;
+                    minIdx = min(minIdx, relativePos);
+                    maxIdx = max(maxIdx, relativePos);
                 // 意図した方向のgapの場合は、有効なgapかどうかをチェック。
                 }
                 else if (!gapUsed &&
@@ -81,6 +85,7 @@ LineLengthPattern countContinuousStonesWithGap(Board *board, int r, int c, int d
                     //　その他の場合は、数えるのをやめる。
                     nextX += (reverse == 0 ? -dx : dx);
                     nextY += (reverse == 0 ? -dy : dy);
+                    relativePos += (reverse == 0 ? -1 : 1);
                     if (isInBoard(nextX, nextY) && board->cells[nextX][nextY] == playerMark) {
                         gapUsed = TRUE;
                         continue;
@@ -93,19 +98,19 @@ LineLengthPattern countContinuousStonesWithGap(Board *board, int r, int c, int d
                 }
                 nextX += (reverse == 0 ? -dx : dx);
                 nextY += (reverse == 0 ? -dy : dy);
+                relativePos += (reverse == 0 ? -1 : 1);
             }
         }
-        printf("gapUsed %d pattern %d length %d\n", gapUsed, result.pattern, length);
-
         // gapを使っている場合、新しい長さとして保存
         // gapを使っていない場合、両サイドともgapがない場合に限り1度だけ保存
         // 片側のみgapがあるのは、長さパターン1つとなる
-        if (gapUsed)
-        {
-            result.lengths[result.pattern] = (length > result.lengths[result.pattern] ? length : result.lengths[result.pattern]);
-            result.pattern++;
-        } else if (result.pattern == 0 && gapSide == 1) {
-            result.lengths[result.pattern] = (length > result.lengths[result.pattern] ? length : result.lengths[result.pattern]);
+        if (gapUsed || (result.pattern == 0 && gapSide == 1)) {
+            result.lines[result.pattern].start.r = r + dx * minIdx;
+            result.lines[result.pattern].start.c = c + dy * minIdx;
+            result.lines[result.pattern].end.r = r + dx * maxIdx;
+            result.lines[result.pattern].end.c = c + dy * maxIdx;
+            result.lines[result.pattern].dir->dx = dx;
+            result.lines[result.pattern].dir->dy = dy;
             result.pattern++;
         }
     }

@@ -492,9 +492,18 @@ void testCountContinuousStonesWithGap() {
     initBoardWithStr(&board, testBoard1);
     LineLengthPattern result1 = countContinuousStonesWithGap(&board, 2, 4, 0, 1, PLAYER_X);
     assert(result1.pattern == 2);
-    assert(result1.lengths[0] == 3);
-    assert(result1.lengths[1] == 3);
+    assert(result1.lines[0].start.r == 2);
+    assert(result1.lines[0].start.c == 1);
+    assert(result1.lines[0].end.r == 2);
+    assert(result1.lines[0].end.c == 4);
+    assert(result1.lines[0].dir->dx == 0);
+    assert(result1.lines[0].dir->dy == 1);
+    assert(result1.lines[1].start.r == 2);
+    assert(result1.lines[1].start.c == 3);
+    assert(result1.lines[1].end.r == 2);
+    assert(result1.lines[1].end.c == 6);
     
+
     // テストケース2: 1種類のみのケース (gapなし)
     const char *testBoard2[] = {
         NULL,
@@ -512,7 +521,12 @@ void testCountContinuousStonesWithGap() {
     initBoardWithStr(&board, testBoard2);
     LineLengthPattern result2 = countContinuousStonesWithGap(&board, 2, 4, 0, 1, PLAYER_X);
     assert(result2.pattern == 1);
-    assert(result2.lengths[0] == 3);
+    assert(result2.lines[0].start.r == 2);
+    assert(result2.lines[0].start.c == 3);
+    assert(result2.lines[0].end.r == 2);
+    assert(result2.lines[0].end.c == 5);
+    assert(result2.lines[0].dir->dx == 0);
+    assert(result2.lines[0].dir->dy == 1);
     
 
         // テストケース3: 片側にしかgapがないケース
@@ -532,7 +546,12 @@ void testCountContinuousStonesWithGap() {
     initBoardWithStr(&board, testBoard3);
     LineLengthPattern result3 = countContinuousStonesWithGap(&board, 2, 4, 0, 1, PLAYER_X);
     assert(result3.pattern == 1);
-    assert(result3.lengths[0] == 5);
+    assert(result3.lines[0].start.r == 2);
+    assert(result3.lines[0].start.c == 1);
+    assert(result3.lines[0].end.r == 2);
+    assert(result3.lines[0].end.c == 6);
+    assert(result3.lines[0].dir->dx == 0);
+    assert(result3.lines[0].dir->dy == 1);
     
 
     printf("All testCountContinuousStonesWithGap passed!\n");

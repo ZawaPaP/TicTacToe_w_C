@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "utils.h"
 #include "plays.h"
 #include "game.h"
 #include "cpu.h"
@@ -173,11 +174,4 @@ int evaluate(Board *board, char playerMark) {
     EvaluationScores opponentScore = __evaluateStones(board, opponentPlayer);
 
     return playerScore.lengthScore - opponentScore.lengthScore;
-}
-
-
-int max(int x, int y) {
-    if (x >= y)
-        return x;
-    return y;
 }

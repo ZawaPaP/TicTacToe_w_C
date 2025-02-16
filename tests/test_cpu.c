@@ -1,19 +1,11 @@
 #include <stdio.h>
 #include <assert.h>
+#include "../include/utils.h"
 #include "../include/cpu.h"
 #include "test_utils.h"
 #include "test_cpu.h"
 
-void testMax() {
-    int x, y;
-    x = 10;
-    y = 3;
-    assert(max(x, y) == x);
 
-    x = -19;
-    y = 3;
-    assert(max(x, y) == y);
-}
 
 void testEvaluateOpenFour() {
     Board board = __prepareBoard();
@@ -132,7 +124,6 @@ void testNegaMax() {
 
 void runCPUTests(){
     printf("Start runCPUTests...\n");
-    testMax();
     testEvaluateOpenFour();
     testEvaluateCloseFour();
     testEvaluateOpenThree();
