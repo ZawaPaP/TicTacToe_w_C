@@ -56,7 +56,7 @@ static int countContinuousStones(Board *board, int r, int c, int dx, int dy, cha
     return length;
 }
 
-// 特定の方向の連続した石を1つのGAPありで数える
+// r, cに石を置いた場合の特定の方向の連続した石を1つのGAPありで数える
 LinePatterns countContinuousStonesWithGap(Board *board, int r, int c, int dx, int dy, char playerMark) {
     LinePatterns result = {.pattern = 0};
     for (int gapSide = 0; gapSide <= 1; gapSide++) {  // 0:左側, 1:右側
@@ -109,8 +109,10 @@ LinePatterns countContinuousStonesWithGap(Board *board, int r, int c, int dx, in
             result.lines[result.pattern].start.c = c + dy * minIdx;
             result.lines[result.pattern].end.r = r + dx * maxIdx;
             result.lines[result.pattern].end.c = c + dy * maxIdx;
-            result.lines[result.pattern].dir->dx = dx;
-            result.lines[result.pattern].dir->dy = dy;
+            result.lines[result.pattern].dir.dx = dx;
+            result.lines[result.pattern].dir.dy = dy;
+            result.lines[result.pattern].hasGap = gapUsed;
+            result.lines[result.pattern].length = length;
             result.pattern++;
         }
     }
@@ -131,6 +133,7 @@ BOOL isWinMove(Board *board, int r, int c, char playerMark) {
 }
 
 BOOL isMakingOverLine(Board *board, int r, int c, char playerMark) {
+    // 禁じ手である、長連の判定関数
     if (playerMark != PLAYER_X)
         return FALSE;
         
@@ -138,6 +141,17 @@ BOOL isMakingOverLine(Board *board, int r, int c, char playerMark) {
         int length = countContinuousStones(board, r, c, DIRS[dir].dx, DIRS[dir].dy, playerMark);
         
         if (length >= 6)
+            return TRUE;
+    }
+    return FALSE;
+}
+
+BOOL isMakingExactFive(Board *board, int r, int c, char playerMark) {
+    // ちょうど5連の並びを作っているかの判定関数
+    for (int dir = 0; dir < dirLength; dir++) {
+        int length = countContinuousStones(board, r, c, DIRS[dir].dx, DIRS[dir].dy, playerMark);
+        
+        if (length == 5)
             return TRUE;
     }
     return FALSE;
@@ -156,44 +170,163 @@ BOOL isOpenLine(Board *board, Cell start, Cell end, Direction dir) {
     );
 }
 
-BOOL isHalfOpenLine(Board *board, Cell start, Cell end, Direction dir) {
+BOOL isAtLeastHalfOpenLine(Board *board, Cell start, Cell end, Direction dir) {
+    // ラインとして少なくとも片側が空いているかどうかの判定関数
 
     // 両サイドが盤面外の場合
     if (!isInBoard(start.r - dir.dx, start.c - dir.dy) && !isInBoard(end.r + dir.dx, end.c + dir.dy))
         return FALSE;
 
     return (
-        !isOpenLine(board, start, end, dir) && (board->cells[start.r - dir.dx][start.c - dir.dy] == EMPTY_CELL ||
-                                                board->cells[end.r + dir.dx][end.c + dir.dy] == EMPTY_CELL));
+        board->cells[start.r - dir.dx][start.c - dir.dy] == EMPTY_CELL ||
+        board->cells[end.r + dir.dx][end.c + dir.dy] == EMPTY_CELL
+        );
 }
 
-/* BOOL isMakingDoubleThreeOrDoubleFour(Board *board, int r, int c, char playerMark) {
-    if (playerMark != PLAYER_X)
-        return FALSE;
+
+Cell getGapIdx(Board *board, LineIdx *line) {
+    Cell result = {.r = -1, .c = -1};
+    
+    // gapがない場合は早期リターン
+    if (!line->hasGap)
+        return result;
         
-    for (int dir = 0; dir < dirLength; dir++) {
-        
+    // 開始位置から終了位置まで探索
+    // ただし両端は探索しない
+    int x = line->start.r + line->dir.dx;
+    int y = line->start.c + line->dir.dy;
+    int endX = line->end.r;
+    int endY = line->end.c;
+    
+    while (x != endX || y != endY) {
+        if (board->cells[x][y] == EMPTY_CELL) {
+            return (Cell){.r = x, .c = y};
+        }
+        x += line->dir.dx;
+        y += line->dir.dy;
     }
+    
+    return result;
+}
+
+BOOL isFour(Board *board, LineIdx *line, char playerMark) {
+    /* 
+    四の定義は、一個の石を加えることで五にできるもの
+    そのため、両サイドが塞がれているものは四ではない。
+    また一個石を置くと5を超えてしまうものは、五にできていないため、四ではない
+    */
+
+    if (line->length != 4)
+        return FALSE;
+
+    if (!isAtLeastHalfOpenLine(board, line->start, line->end, line->dir))
+        return FALSE;
+    
+    // gapがある場合は、そこに石を置いて五になるかを判定
+    if (line->hasGap) {
+        Cell gap = getGapIdx(board, line);
+        return isMakingExactFive(board, gap.r, gap.c, playerMark);
+    }
+
+    // gapがない場合は、両側の空いているマスに置いて五になるかを確認
+    Cell leftEdge = {
+        .r = line->start.r - line->dir.dx, 
+        .c = line->start.c - line->dir.dy
+    };
+    Cell rightEdge = {
+        .r = line->end.r + line->dir.dx, 
+        .c = line->end.c + line->dir.dy
+    };
+
+    // 両端のマスが盤内かつ空いているかをチェック
+    BOOL canPlaceLeft = isInBoard(leftEdge.r, leftEdge.c) && 
+                       board->cells[leftEdge.r][leftEdge.c] == EMPTY_CELL;
+    BOOL canPlaceRight = isInBoard(rightEdge.r, rightEdge.c) && 
+                        board->cells[rightEdge.r][rightEdge.c] == EMPTY_CELL;
+
+    // どちらかの端に置いて五になるかをチェック
+    return (canPlaceLeft && isMakingExactFive(board, leftEdge.r, leftEdge.c, playerMark)) ||
+           (canPlaceRight && isMakingExactFive(board, rightEdge.r, rightEdge.c, playerMark));
+}
+
+// row, colに石を置いたときに、四四の禁じ手かどうかの判定関数
+BOOL isMakingDoubleFour(Board *board, int row, int col, char playerMark){
+    if (playerMark != PLAYER_X) {
+        return FALSE;
+    }
+    if (isWinMove(board, row, col, playerMark)) {
+        return FALSE;
+    }
+    //一時的にボードを作り石を置いてみる
+    Board tmpBoard = *board;
+    tmpBoard.cells[row][col] = playerMark;
+    
+    int fourLineCount = 0;
+
+    // 4方向それぞれについて四を数える
+    for (int dir = 0; dir < dirLength; dir++) {
+        LinePatterns linePatterns = countContinuousStonesWithGap(
+            &tmpBoard, row, col, DIRS[dir].dx, DIRS[dir].dy, playerMark
+        );
+        
+        for (int i = 0; i < linePatterns.pattern; i++) {
+            if (isFour(&tmpBoard, &linePatterns.lines[i], playerMark)) {
+                fourLineCount++;
+                printf("Found a four! Total count: %d\n", fourLineCount);
+                if (fourLineCount > 1)
+                    return TRUE;
+            }
+        }
+    }
+    
     return FALSE;
-} */
+}
 
 
-
-/* BOOL isEffectiveThree(Board *board, int row, int col, int dx, int dy, char playerMark) {
+/* BOOL isEffectiveThree(Board *board, LineIdx *line) {
     // 3として有効であるかどうかの判定 => 4を作ったときに次に置く場所が塞がれておらず、禁じ手にもなっていない
     // そういった4を作れるかどうかを確認する
-    LinePatterns lines;
-    lines = countContinuousStonesWithGap(board, row, col, dx, dy, playerMark);
-
+    
     // ラインの両サイドが空いていることを確認。
+    if (!isOpenLine(board, line->start, line->end, line->dir))
+            return FALSE;
 
     // もし飛び3の場合、そのgapに石を置くことができるか (禁じ手となっていないか)
+    if (line->hasGap == TRUE) {
+        // getGapCell
+        // isProhibitedHands
 
-    // gapがない場合は、両サイドの少なくとも一方が2マス分空いているか
-    // 有効な3の例: __XXX__, O_XXX__
-    // 有効ではない3の例: O_XXX_O
+    }
+    else
+    {
+        // gapがない場合は、達四にできる手段があるか
+        // 有効な3の例: __XXX__, O_XXX__
+        // 有効ではない3の例: O_XXX_O
+        Cell startSide = {.r = line->start.r - line->dir.dx, .c = line->start.c - line->dir.dy};
+        Cell endSide = {.r = line->end.r + line->dir.dx, .c = line->end.c + line->dir.dy};
+        return isAtLeastHalfOpenLine(board, startSide, endSide, line->dir);
+    }
+} */
 
+/* BOOL isDoubleThree(Board *board, int row, int col, int dx, int dy, char playerMark){
+    if (playerMark != PLAYER_X)
+        return FALSE;
 
+    int threeCounts = 0;
+
+    LinePatterns linePatterns;
+    for (int dir = 0; dir < dirLength; dir++) {
+        linePatterns = countContinuousStonesWithGap(board, row, col, dx, dy, playerMark);
+        if (linePatterns.pattern == 0) 
+            continue;
+        for (int i = 0; i < linePatterns.pattern; i++) {
+            if (isEffectiveThree(board, &linePatterns.lines[i]))
+                threeCounts++;
+        }
+        if (threeCounts > 1)
+            return TRUE;
+    }
+    return FALSE;
 } */
 
 

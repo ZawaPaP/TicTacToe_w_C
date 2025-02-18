@@ -496,8 +496,8 @@ void testCountContinuousStonesWithGap() {
     assert(result1.lines[0].start.c == 1);
     assert(result1.lines[0].end.r == 2);
     assert(result1.lines[0].end.c == 4);
-    assert(result1.lines[0].dir->dx == 0);
-    assert(result1.lines[0].dir->dy == 1);
+    assert(result1.lines[0].dir.dx == 0);
+    assert(result1.lines[0].dir.dy == 1);
     assert(result1.lines[1].start.r == 2);
     assert(result1.lines[1].start.c == 3);
     assert(result1.lines[1].end.r == 2);
@@ -525,8 +525,8 @@ void testCountContinuousStonesWithGap() {
     assert(result2.lines[0].start.c == 3);
     assert(result2.lines[0].end.r == 2);
     assert(result2.lines[0].end.c == 5);
-    assert(result2.lines[0].dir->dx == 0);
-    assert(result2.lines[0].dir->dy == 1);
+    assert(result2.lines[0].dir.dx == 0);
+    assert(result2.lines[0].dir.dy == 1);
     
 
         // テストケース3: 片側にしかgapがないケース
@@ -550,8 +550,8 @@ void testCountContinuousStonesWithGap() {
     assert(result3.lines[0].start.c == 1);
     assert(result3.lines[0].end.r == 2);
     assert(result3.lines[0].end.c == 6);
-    assert(result3.lines[0].dir->dx == 0);
-    assert(result3.lines[0].dir->dy == 1);
+    assert(result3.lines[0].dir.dx == 0);
+    assert(result3.lines[0].dir.dy == 1);
     
 
     printf("All testCountContinuousStonesWithGap passed!\n");
@@ -671,41 +671,245 @@ void testIsHalfOpenLine() {
     Cell end4 = {.r = 8, .c = 8};
     Direction dir4 = {.dx = 1, .dy = 1};
 
-    assert(isHalfOpenLine(&board, start1, end1, dir1) == TRUE);
-    assert(isHalfOpenLine(&board, start2, end2, dir2) == FALSE);
-    assert(isHalfOpenLine(&board, start3, end3, dir3) == TRUE);
-    assert(isHalfOpenLine(&board, start4, end4, dir4) == FALSE);
+    assert(isAtLeastHalfOpenLine(&board, start1, end1, dir1) == TRUE);
+    assert(isAtLeastHalfOpenLine(&board, start2, end2, dir2) == FALSE);
+    assert(isAtLeastHalfOpenLine(&board, start3, end3, dir3) == TRUE);
+    assert(isAtLeastHalfOpenLine(&board, start4, end4, dir4) == TRUE);
 
     printf("All testIsHalfOpenLine passed!\n");
 
 }
 
-void testIsEffectiveThree() {
+void testGetGapIdx() {
     Board board;
-
-    printf("Start testIsEffectiveThree...\n");
-
-    // @に石を置くと、4x4に見えるが、横の列は完成させると長連を作るため、
-    // 横の列は完成させることができず4と見做されない。
+    printf("Start testGetGapIdx...\n");
+    
+    // テストケース1: 水平方向のgap
     const char *testBoard1[] = {
-            NULL,
-            ".........",
-            "..@XX...", 
-            "..X......",
-            "..X......",
-            ".........",
-            ".........",
-            ".........",
-            ".........",
-            "........."
-        };
+        NULL,
+        ".........",
+        ".@XX.X...", 
+        ".........",
+        ".........",
+        ".........",
+        ".........",
+        ".........",
+        ".........",
+        "........."
+    };
+    
     initBoardWithStr(&board, testBoard1);
-    assert(__wouldCreateOverline(&board, 2, 3, 0, 1, PLAYER_X) == TRUE);
-
-
-    printf("All testIsEffectiveThree passed!\n");
-
+    LineIdx line1 = {
+        .start = {.r = 2, .c = 2},
+        .end = {.r = 2, .c = 6},
+        .dir = {.dx = 0, .dy = 1},
+        .hasGap = TRUE
+    };
+    
+    Cell gap1 = getGapIdx(&board, &line1);
+    assert(gap1.r == 2);
+    assert(gap1.c == 5);
+    
+    // テストケース2: gapなしのライン
+    const char *testBoard2[] = {
+        NULL,
+        ".........",
+        "..XXX....", 
+        ".........",
+        ".........",
+        ".........",
+        ".........",
+        ".........",
+        ".........",
+        "........."
+    };
+    
+    initBoardWithStr(&board, testBoard2);
+    LineIdx line2 = {
+        .start = {.r = 2, .c = 3},
+        .end = {.r = 2, .c = 6},
+        .dir = {.dx = 0, .dy = 1},
+        .hasGap = FALSE
+    };
+    
+    Cell gap2 = getGapIdx(&board, &line2);
+    assert(gap2.r == -1);
+    assert(gap2.c == -1);
+    
+    // テストケース3: 斜め方向のgap
+    const char *testBoard3[] = {
+        NULL,
+        ".........",
+        "..X......",
+        "...X.....",
+        ".........", 
+        ".....X...",
+        ".........",
+        ".........",
+        ".........",
+        "........."
+    };
+    
+    initBoardWithStr(&board, testBoard3);
+    LineIdx line3 = {
+        .start = {.r = 2, .c = 3},
+        .end = {.r = 5, .c = 6},
+        .dir = {.dx = 1, .dy = 1},
+        .hasGap = TRUE
+    };
+    
+    Cell gap3 = getGapIdx(&board, &line3);
+    assert(gap3.r == 4);
+    assert(gap3.c == 5);
+    
+    printf("All testGetGapIdx passed!\n");
 }
+
+void testIsFour() {
+    Board board;
+    printf("Start testIsFour...\n");
+    
+    // テストケース1: gapあり、なしの四
+    const char *testBoard1[] = {
+        NULL,
+        ".........",
+        ".XXX.X...",
+        ".........",
+        "..X......",
+        "...X.....",
+        "....X....",
+        ".....X...",
+        ".........",
+        "........."
+    };
+    
+    initBoardWithStr(&board, testBoard1);
+    LineIdx line1 = {
+        .start = {.r = 2, .c = 2},
+        .end = {.r = 2, .c = 6},
+        .dir = {.dx = 0, .dy = 1},
+        .hasGap = TRUE,
+        .length = 4
+    };
+
+    LineIdx line2 = {
+        .start = {.r = 4, .c = 3},
+        .end = {.r = 7, .c = 6},
+        .dir = {.dx = 1, .dy = 1},
+        .hasGap = FALSE,
+        .length = 4
+};
+    assert(isFour(&board, &line1, PLAYER_X) == TRUE);
+    assert(isFour(&board, &line2, PLAYER_X) == TRUE);
+
+    // テストケース2: 四ではないケース
+    const char *testBoard2[] = {
+        NULL,
+        ".........",
+        ".XXOX....",
+        ".........",
+        "....XXX..",
+        ".........",
+        ".........",
+        ".........",
+        "XXXX.X...",
+        "........."
+    };
+    
+    initBoardWithStr(&board, testBoard2);
+    LineIdx line3 = {
+        .start = {.r = 2, .c = 2},
+        .end = {.r = 2, .c = 6},
+        .dir = {.dx = 0, .dy = 1},
+        .hasGap = TRUE,
+        .length = 4
+    };
+
+    LineIdx line4 = {
+        .start = {.r = 4, .c = 5},
+        .end = {.r = 4, .c = 7},
+        .dir = {.dx = 0, .dy = 1},
+        .hasGap = FALSE,
+        .length = 3
+    };
+
+    LineIdx line5 = {
+        .start = {.r = 8, .c = 1},
+        .end = {.r = 8, .c = 6},
+        .dir = {.dx = 0, .dy = 1},
+        .hasGap = FALSE,
+        .length = 4
+    };
+    assert(isFour(&board, &line3, PLAYER_X) == FALSE);
+    assert(isFour(&board, &line4, PLAYER_X) == FALSE);
+    assert(isFour(&board, &line5, PLAYER_X) == FALSE);
+    
+    printf("All testIsFour passed!\n");
+}
+
+void testIsMakingDoubleFour() {
+    Board board;
+    printf("Start testIsMakingDoubleFour...\n");
+    
+    // テストケース1: 四四
+    const char *testBoard1[] = {
+        NULL,
+        "..X......",
+        "..@XXX...", 
+        "..X......", 
+        "..X......",
+        ".........",
+        "...X.....",
+        "....X...",
+        ".....X...",
+        "...XXX@.."
+    };
+    
+    initBoardWithStr(&board, testBoard1);
+    assert(isMakingDoubleFour(&board, 2, 3, PLAYER_X) == TRUE);
+    assert(isMakingDoubleFour(&board, 9, 7, PLAYER_X) == TRUE);
+    
+    // テストケース2: 四が1つだけ
+    const char *testBoard2[] = {
+        NULL,
+        "..X......",
+        ".O@XXXO..",
+        "..X......",
+        "..X......",
+        ".........",
+        ".....X...",
+        "..XXX@.X.",
+        ".....X...",
+        ".....X..."
+    };
+    
+    initBoardWithStr(&board, testBoard2);
+    assert(isMakingDoubleFour(&board, 2, 3, PLAYER_X) == FALSE);
+    assert(isMakingDoubleFour(&board, 7, 6, PLAYER_X) == FALSE);
+
+
+    // テストケース3: 四四があるが、五を作っているケース
+    const char *testBoard3[] = {
+        NULL,
+        ".XX......",
+        ".X@X.X...",
+        "..XX.....",
+        "..X.X....",
+        ".....X...",
+        ".........",
+        ".........",
+        ".........",
+        "........."
+    };
+    
+    initBoardWithStr(&board, testBoard3);
+    assert(isMakingDoubleFour(&board, 2, 3, PLAYER_X) == FALSE);
+
+    // テストケース4: 白の手番
+    assert(isMakingDoubleFour(&board, 1, 1, PLAYER_O) == FALSE);
+    printf("All testIsMakingDoubleFour passed!\n");
+}
+
 
 void runBoardTests() {
     printf("Start runBoardTests...\n");
@@ -718,5 +922,8 @@ void runBoardTests() {
     testCountContinuousStonesWithGap();
     testIsOpenLine();
     testIsHalfOpenLine();
+    testGetGapIdx();
+    testIsFour();
+    testIsMakingDoubleFour();
     printf("Finished runBoardTests.\n");
 }

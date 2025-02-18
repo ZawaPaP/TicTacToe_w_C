@@ -71,7 +71,8 @@ typedef struct {
     Cell start;
     Cell end;
     int length;
-    Direction dir[2];
+    Direction dir;
+    BOOL hasGap;
 } LineIdx;
 
 typedef struct {
