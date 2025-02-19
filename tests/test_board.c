@@ -905,6 +905,26 @@ void testIsMakingDoubleFour() {
     initBoardWithStr(&board, testBoard3);
     assert(isMakingDoubleFour(&board, 2, 3, PLAYER_X) == FALSE);
 
+    // テストケース4: 一直線上の四四のケース
+    const char *testBoard4[] = {
+        NULL,
+        "XXX.@.XXX",
+        ".........",
+        ".X.X@X.X.",
+        ".........",
+        ".XX.X@.XX",
+        ".........",
+        ".........",
+        ".X.XX@.X.",
+        "........."
+    };
+    
+    initBoardWithStr(&board, testBoard4);
+    assert(isMakingDoubleFour(&board, 1, 5, PLAYER_X) == TRUE);
+    assert(isMakingDoubleFour(&board, 3, 5, PLAYER_X) == TRUE);
+    assert(isMakingDoubleFour(&board, 5, 6, PLAYER_X) == TRUE);
+    assert(isMakingDoubleFour(&board, 8, 6, PLAYER_X) == TRUE);
+
     // テストケース4: 白の手番
     assert(isMakingDoubleFour(&board, 1, 1, PLAYER_O) == FALSE);
     printf("All testIsMakingDoubleFour passed!\n");
