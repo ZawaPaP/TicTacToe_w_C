@@ -888,7 +888,7 @@ void testIsMakingDoubleFour() {
     assert(isMakingDoubleFour(&board, 7, 6, PLAYER_X) == FALSE);
 
 
-    // テストケース3: 四四があるが、五を作っているケース
+    // テストケース3: 五を作っていても、この関数は気にせず四四を判定する
     const char *testBoard3[] = {
         NULL,
         ".XX......",
@@ -903,7 +903,7 @@ void testIsMakingDoubleFour() {
     };
     
     initBoardWithStr(&board, testBoard3);
-    assert(isMakingDoubleFour(&board, 2, 3, PLAYER_X) == FALSE);
+    assert(isMakingDoubleFour(&board, 2, 3, PLAYER_X) == TRUE);
 
     // テストケース4: 一直線上の四四のケース
     const char *testBoard4[] = {
@@ -930,6 +930,65 @@ void testIsMakingDoubleFour() {
     printf("All testIsMakingDoubleFour passed!\n");
 }
 
+void testIsMakingGreatFour() {
+    Board board;
+    printf("Start testIsMakingGreatFour...\n");
+    
+    // テストケース:
+    // @は達四になるケース
+    // #はならないケース
+    // Ref (https://tokai-renjukai.pya.jp/siryo/RenjuKiso/RenjuKiso-1-2.pdf)
+    const char *testBoard1[] = {
+        NULL,
+        ".#@XXX@#.",
+        "....O....",
+        ".O#XXX@#.",
+        "...O.O...",
+        ".........",
+        ".........",
+        ".........",
+        "..OO@O.O.",
+        "OOO@....."
+    };
+    
+    initBoardWithStr(&board, testBoard1);
+    assert(isMakingGreatFour(&board, 1, 2, PLAYER_X) == FALSE);
+    assert(isMakingGreatFour(&board, 1, 3, PLAYER_X) == TRUE);
+    assert(isMakingGreatFour(&board, 1, 7, PLAYER_X) == TRUE);
+    assert(isMakingGreatFour(&board, 1, 8, PLAYER_X) == FALSE);
+    assert(isMakingGreatFour(&board, 3, 3, PLAYER_X) == FALSE);
+    assert(isMakingGreatFour(&board, 3, 7, PLAYER_X) == TRUE);
+    assert(isMakingGreatFour(&board, 3, 8, PLAYER_X) == FALSE);
+    assert(isMakingGreatFour(&board, 8, 5, PLAYER_O) == TRUE);
+    assert(isMakingGreatFour(&board, 9, 4, PLAYER_O) == FALSE);
+
+    // テストケース2:
+    const char *testBoard2[] = {
+        NULL,
+        ".........",
+        "..OXXX##.",
+        "....#....",
+        ".#XX@X#..",
+        "..#......",
+        "#XX#.X.X.",
+        ".........",
+        ".........",
+        "........."
+    };
+    
+    initBoardWithStr(&board, testBoard2);
+    assert(isMakingGreatFour(&board, 2, 7, PLAYER_X) == FALSE);
+    assert(isMakingGreatFour(&board, 2, 8, PLAYER_X) == FALSE);
+    assert(isMakingGreatFour(&board, 3, 5, PLAYER_X) == FALSE);
+    assert(isMakingGreatFour(&board, 4, 2, PLAYER_X) == FALSE);
+    assert(isMakingGreatFour(&board, 4, 5, PLAYER_X) == TRUE);
+    assert(isMakingGreatFour(&board, 4, 7, PLAYER_X) == FALSE);
+    assert(isMakingGreatFour(&board, 5, 3, PLAYER_X) == FALSE);
+    assert(isMakingGreatFour(&board, 6, 1, PLAYER_X) == FALSE);
+    assert(isMakingGreatFour(&board, 6, 4, PLAYER_X) == FALSE);
+    printf("All testIsMakingGreatFour passed!\n");
+}
+
 
 void runBoardTests() {
     printf("Start runBoardTests...\n");
@@ -945,5 +1004,6 @@ void runBoardTests() {
     testGetGapIdx();
     testIsFour();
     testIsMakingDoubleFour();
+    testIsMakingGreatFour();
     printf("Finished runBoardTests.\n");
 }

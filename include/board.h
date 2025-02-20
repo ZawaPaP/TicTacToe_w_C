@@ -18,4 +18,5 @@ BOOL __isDoubleThree(Board *board, int x, int y);
 Cell getGapIdx(Board *board, LineIdx *line);
 BOOL isFour(Board *board, LineIdx *line, char playerMark);
 BOOL isMakingDoubleFour(Board *board, int row, int col, char playerMark);
+BOOL isMakingGreatFour(Board *board, int r, int c, char playerMark);
 #endif
