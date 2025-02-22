@@ -3,9 +3,6 @@
 #include "plays.h"
 #include "board.h"
 
-BOOL isValidMove(int row, int col, Board *board);
-
-
 void printBoard(Board *board) {
     int i, j, k;
     printf("    ");
@@ -51,14 +48,6 @@ void printDrawGame() {
     printf("\tDrow. Nice game!\n\n");
 }
 
-
-BOOL canApplyMove(int row, int col, Board* board) {
-    if (!isValidMove(row, col, board)) {
-        return FALSE;
-    }
-    return TRUE;
-}
-
 BOOL isValidMoveInput(int *x, int *y){
     char str[8];
 
@@ -83,7 +72,7 @@ BOOL isValidMoveInput(int *x, int *y){
     return TRUE;
 }
 
-BOOL isValidMove(int row, int col, Board* board) {
+BOOL isValidMove(int row, int col, Board* board, char playerMark) {
     if (row < 1 || BOARD_ROWS < row || col < 1 || BOARD_COLUMNS < col) {
         printf("Error: Row and Column must be between 1 and %d.\n", BOARD_ROWS);
         return FALSE;
@@ -93,6 +82,17 @@ BOOL isValidMove(int row, int col, Board* board) {
         printf("Error: The %d, %d is already marked.\n", row, col);
         return FALSE;
     }
+
+    if (isProhibitedMove(board, row, col, playerMark)) {
+        printf("Error: The %d, %d is prohibited move.\n", row, col);
+        return FALSE;
+    }
     return TRUE;
 }
 
+BOOL canApplyMove(int row, int col, Board* board, char playerMark) {
+    if (!isValidMove(row, col, board, playerMark)) {
+        return FALSE;
+    }
+    return TRUE;
+}

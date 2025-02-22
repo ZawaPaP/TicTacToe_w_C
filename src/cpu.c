@@ -24,7 +24,7 @@ void getCpuMove(int *row, int *col, Board *board, char playerMark) {
     while(1) {
         int randR = 1 + rand() % BOARD_ROWS;
         int randC = 1 + rand() % BOARD_COLUMNS;
-        if (canApplyMove(randR, randC, board)) {
+        if (canApplyMove(randR, randC, board, playerMark)) {
             *row = randR;
             *col = randC;
             break;

@@ -80,7 +80,7 @@ void playGame(int mode)
             while (1)
             {
                 if(isValidMoveInput(&row, &col)) {
-                    if (canApplyMove(row, col, &board)) {
+                    if (canApplyMove(row, col, &board, currentPlayer)) {
                         break;
                     }
                 }

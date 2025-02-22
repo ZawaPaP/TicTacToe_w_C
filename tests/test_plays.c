@@ -77,16 +77,16 @@ void testPrintBoard(){
 void testPlaceMoveExpected(){
 
     Board board = __prepareBoard();
-    assert(canApplyMove(5, 5, &board) == TRUE);
+    assert(canApplyMove(5, 5, &board, PLAYER_X) == TRUE);
 
     // ４隅のエッジケースについてテスト
-    assert(canApplyMove(1, 1, &board) == TRUE);
+    assert(canApplyMove(1, 1, &board, PLAYER_X) == TRUE);
     
-    assert(canApplyMove(BOARD_ROWS, 1, &board) == TRUE);
+    assert(canApplyMove(BOARD_ROWS, 1, &board, PLAYER_X) == TRUE);
 
-    assert(canApplyMove(1, BOARD_COLUMNS, &board) == TRUE);
+    assert(canApplyMove(1, BOARD_COLUMNS, &board, PLAYER_X) == TRUE);
 
-    assert(canApplyMove(BOARD_ROWS, BOARD_COLUMNS, &board) == TRUE);
+    assert(canApplyMove(BOARD_ROWS, BOARD_COLUMNS, &board, PLAYER_X) == TRUE);
 }
 
 
@@ -94,12 +94,12 @@ void testPlaceMoveFailedAlreadyMarked() {
     Board board = __prepareBoard();
     board.cells[5][5] = PLAYER_X;
 
-    assert(canApplyMove(5, 5, &board) == FALSE);
+    assert(canApplyMove(5, 5, &board, PLAYER_X) == FALSE);
 }
 
 void testPlaceMoveFailedOutOfRange() {
     Board board = __prepareBoard();
-    assert(canApplyMove(BOARD_ROWS + 1, BOARD_COLUMNS, &board) == FALSE);
+    assert(canApplyMove(BOARD_ROWS + 1, BOARD_COLUMNS, &board, PLAYER_X) == FALSE);
 }
 
 void testGetInputExpectedStr()
@@ -264,15 +264,15 @@ void testValidateInputExpectedRange() {
 
     int row = 5;
     int col = 5;
-    assert(isValidMove(row, col, &board) == TRUE);
+    assert(isValidMove(row, col, &board, PLAYER_X) == TRUE);
 
     int rowEdgeBegin = 1;
     int colEdgeBegin = 1;
-    assert(isValidMove(rowEdgeBegin, colEdgeBegin, &board) == TRUE);
+    assert(isValidMove(rowEdgeBegin, colEdgeBegin, &board, PLAYER_X) == TRUE);
 
     int rowEdgeEnd = BOARD_ROWS;
     int colEdgeEnd = BOARD_COLUMNS;
-    assert(isValidMove(rowEdgeEnd, colEdgeEnd, &board) == TRUE);
+    assert(isValidMove(rowEdgeEnd, colEdgeEnd, &board, PLAYER_X) == TRUE);
 
 }
 
@@ -285,14 +285,14 @@ void testValidateInputFailedOutOfRange()
     int zeroRow = 0;
     int zeroCol = 0;
 
-    assert(isValidMove(zeroRow, zeroCol, &board) == FALSE);
+    assert(isValidMove(zeroRow, zeroCol, &board, PLAYER_X) == FALSE);
     
     int negativeInt = -1;
     int randInt = 4;
-    assert(isValidMove(negativeInt, randInt, &board) == FALSE);
+    assert(isValidMove(negativeInt, randInt, &board, PLAYER_X) == FALSE);
 
     int ToobigInt = 123490;
-    assert(isValidMove(ToobigInt, randInt, &board) == FALSE);
+    assert(isValidMove(ToobigInt, randInt, &board, PLAYER_X) == FALSE);
  }
 
  void testValidateInputFailedNotEmpty() {
@@ -302,17 +302,17 @@ void testValidateInputFailedOutOfRange()
      int col = 5;
 
      board.cells[row][col] = PLAYER_O;
-    assert(isValidMove(row, col, &board) == FALSE);
+    assert(isValidMove(row, col, &board, PLAYER_X) == FALSE);
 
     int rowEdgeBegin = 1;
     int colEdgeBegin = 1;
     board.cells[rowEdgeBegin][colEdgeBegin] = PLAYER_O;
-    assert(isValidMove(rowEdgeBegin, colEdgeBegin, &board) == FALSE);
+    assert(isValidMove(rowEdgeBegin, colEdgeBegin, &board, PLAYER_X) == FALSE);
 
     int rowEdgeEnd = BOARD_ROWS;
     int colEdgeEnd = BOARD_COLUMNS;
     board.cells[rowEdgeEnd][colEdgeEnd] = PLAYER_O;
-    assert(isValidMove(rowEdgeEnd, colEdgeEnd, &board) == FALSE);
+    assert(isValidMove(rowEdgeEnd, colEdgeEnd, &board, PLAYER_X) == FALSE);
  }
 
 void runPlaysTests() {

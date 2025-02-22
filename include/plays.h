@@ -5,8 +5,8 @@
 
 
 BOOL isValidMoveInput(int *x, int *y);
-BOOL canApplyMove(int row, int col, Board *board);
-BOOL isValidMove(int row, int col, Board *board);
+BOOL canApplyMove(int row, int col, Board *board, char playerMark);
+BOOL isValidMove(int row, int col, Board *board, char playerMark);
 void printBoard(Board *board);
 void printGameStatus(int turnCounts, char player);
 void printWinner(char player);
