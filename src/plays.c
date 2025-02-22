@@ -1,19 +1,28 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include "plays.h"
 #include "board.h"
 
 void printBoard(Board *board) {
     int i, j, k;
-    printf("    ");
+    printf("\t");
     for (k = 1; k <= BOARD_COLUMNS; k++) {
         printf("%d   ", k);
     }
     printf("\n\n");
 
+    char separator[4 * BOARD_COLUMNS + 4];  // 各列に "- + " (3文字) + 最後の "-" (1文字) + 余裕
+    separator[0] = '\0';
+    strcat(separator, "\t");
+    for (j = 1; j < BOARD_COLUMNS; j++) {
+        strcat(separator, "- + ");
+    }
+    strcat(separator, "-");
+
     for (i = 1; i <= BOARD_ROWS; i++)
     {
-        printf("%d   ", i);
+        printf("%d\t", i);
         for (j = 1; j < BOARD_COLUMNS; j++)
         {
             if (i == board->lastRow && j == board->lastCol) {
@@ -30,7 +39,7 @@ void printBoard(Board *board) {
 
         if (i < BOARD_ROWS)
         {
-            printf("    - + - + - + - + - + - + - + - + - \n");
+            printf("%s\n", separator);
         }
     }
     printf("\n\n");

@@ -383,7 +383,7 @@ void testGetGapIdx() {
     };
     
     initBoardWithStr(&board, testBoard1);
-    LineIdx line1 = {
+    LineInfo line1 = {
         .start = {.r = 2, .c = 2},
         .end = {.r = 2, .c = 6},
         .dir = {.dx = 0, .dy = 1},
@@ -409,7 +409,7 @@ void testGetGapIdx() {
     };
     
     initBoardWithStr(&board, testBoard2);
-    LineIdx line2 = {
+    LineInfo line2 = {
         .start = {.r = 2, .c = 3},
         .end = {.r = 2, .c = 6},
         .dir = {.dx = 0, .dy = 1},
@@ -435,7 +435,7 @@ void testGetGapIdx() {
     };
     
     initBoardWithStr(&board, testBoard3);
-    LineIdx line3 = {
+    LineInfo line3 = {
         .start = {.r = 2, .c = 3},
         .end = {.r = 5, .c = 6},
         .dir = {.dx = 1, .dy = 1},
@@ -468,7 +468,7 @@ void testIsFour() {
     };
     
     initBoardWithStr(&board, testBoard1);
-    LineIdx line1 = {
+    LineInfo line1 = {
         .start = {.r = 2, .c = 2},
         .end = {.r = 2, .c = 6},
         .dir = {.dx = 0, .dy = 1},
@@ -476,7 +476,7 @@ void testIsFour() {
         .length = 4
     };
 
-    LineIdx line2 = {
+    LineInfo line2 = {
         .start = {.r = 4, .c = 3},
         .end = {.r = 7, .c = 6},
         .dir = {.dx = 1, .dy = 1},
@@ -501,7 +501,7 @@ void testIsFour() {
     };
     
     initBoardWithStr(&board, testBoard2);
-    LineIdx line3 = {
+    LineInfo line3 = {
         .start = {.r = 2, .c = 2},
         .end = {.r = 2, .c = 6},
         .dir = {.dx = 0, .dy = 1},
@@ -509,7 +509,7 @@ void testIsFour() {
         .length = 4
     };
 
-    LineIdx line4 = {
+    LineInfo line4 = {
         .start = {.r = 4, .c = 5},
         .end = {.r = 4, .c = 7},
         .dir = {.dx = 0, .dy = 1},
@@ -517,7 +517,7 @@ void testIsFour() {
         .length = 3
     };
 
-    LineIdx line5 = {
+    LineInfo line5 = {
         .start = {.r = 8, .c = 1},
         .end = {.r = 8, .c = 6},
         .dir = {.dx = 0, .dy = 1},
@@ -693,28 +693,28 @@ void testIsThree() {
     };
     
     initBoardWithStr(&board, testBoard1);
-    LineIdx line1 = {
+    LineInfo line1 = {
         .start = {.r = 1, .c = 3},
         .end = {.r = 1, .c = 5},
         .dir = {.dx = 0, .dy = 1},
         .hasGap = FALSE,
         .length = 3
     };
-    LineIdx line2 = {
+    LineInfo line2 = {
         .start = {.r = 2, .c = 8},
         .end = {.r = 5, .c = 5},
         .dir = {.dx = 1, .dy = -1},
         .hasGap =TRUE, 
         .length = 3
     };
-    LineIdx line3 = {
+    LineInfo line3 = {
         .start = {.r = 4, .c = 3},
         .end = {.r = 4, .c = 6},
         .dir = {.dx = 0, .dy = 1},
         .hasGap = TRUE,
         .length = 3
     };
-    LineIdx line4 = {
+    LineInfo line4 = {
         .start = {.r = 9, .c = 2},
         .end = {.r = 9, .c = 5},
         .dir = {.dx = 0, .dy = 1},
@@ -744,21 +744,21 @@ void testIsThree() {
     // 5行目は長連筋でそれぞれ三とはならない
     
     initBoardWithStr(&board, testBoard2);
-    LineIdx line5 = {
+    LineInfo line5 = {
         .start = {.r = 1, .c = 2},
         .end = {.r = 1, .c = 4},
         .dir = {.dx = 0, .dy = 1},
         .hasGap = FALSE,
         .length = 3
     };
-    LineIdx line6 = {
+    LineInfo line6 = {
         .start = {.r = 3, .c = 5},
         .end = {.r = 3, .c = 7},
         .dir = {.dx = 0, .dy = 1},
         .hasGap =FALSE, 
         .length = 3
     };
-    LineIdx line7 = {
+    LineInfo line7 = {
         .start = {.r = 5, .c = 2},
         .end = {.r = 5, .c = 5},
         .dir = {.dx = 0, .dy = 1},
@@ -788,7 +788,7 @@ void testIsThree() {
     initBoardWithStr(&board, testBoard3);
     board.cells[3][5] = PLAYER_X;
 
-    LineIdx line8 = {
+    LineInfo line8 = {
         .start = {.r = 3, .c = 5},
         .end = {.r = 5, .c = 5},
         .dir = {.dx = 1, .dy = 0},
@@ -800,7 +800,7 @@ void testIsThree() {
     board.cells[3][5] = EMPTY_CELL;
     board.cells[5][6] = PLAYER_X;
 
-    LineIdx line9 = {
+    LineInfo line9 = {
         .start = {.r = 4, .c = 7},
         .end = {.r = 7, .c = 4},
         .dir = {.dx = 1, .dy = -1},

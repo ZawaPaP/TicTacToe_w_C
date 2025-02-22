@@ -12,10 +12,10 @@
 
 #define QUEUE_SIZE 100
 
-#define NEGA_MAX_DEPTH 2
+#define NEGA_MAX_DEPTH 3
 
 // ライン長さスコア
-#define WIN_POINTS 999999
+#define WIN_POINTS 99999
 #define OPEN_FOUR_POINTS 5000
 #define CLOSED_FOUR_POINTS 500
 #define OPEN_THREE_POINTS 500
@@ -41,6 +41,11 @@ typedef struct {
     int lastRow, lastCol;
 } Board;
 
+typedef struct {
+    int r;
+    int c;
+} Cell;
+
 typedef enum
 {
     PLAYER_PLAYER = 1,
@@ -55,10 +60,6 @@ typedef enum
     CLOSED = 2
 } EDGE_STATUS;
 
-typedef struct {
-    int r;
-    int c;
-} Cell;
 
 // 方向を表す構造体
 typedef struct
@@ -73,22 +74,11 @@ typedef struct {
     int length;
     Direction dir;
     BOOL hasGap;
-} LineIdx;
-
-typedef struct {
-    int startIdx;
-    int endIdx;
-    BOOL hasGap;
 } LineInfo;
-
-typedef struct {
-    LineInfo lines[10];
-    int count;
-} LineInfoArray;
 
 // gap込みで長さを測ると、gapの位置によって、同じラインが最大２パターンの長さを持つ。
 typedef struct {
-    LineIdx lines[2];  // 最大2パターンを格納
+    LineInfo lines[2];  // 最大2パターンを格納
     int pattern; // 見つかったパターンの数（1または2）
 } LinePatterns;
 

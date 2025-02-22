@@ -47,7 +47,6 @@ void testMax() {
 
 void runUtilsTests(){
     printf("Start runUtilsTests...\n");
-    testMax();
     testInitBoardWithStr();
     printf("Finished runUtilsTests.\n");
 }

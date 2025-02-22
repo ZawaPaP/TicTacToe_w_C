@@ -116,7 +116,7 @@ void testNegaMax() {
     board.cells[8][9] = PLAYER_O;
 
     int bestRow = -1, bestCol = -1;
-    negaMax(&board, NEGA_MAX_DEPTH, PLAYER_X, &bestRow, &bestCol);
+    negaMax(&board, NEGA_MAX_DEPTH, PLAYER_X, &bestRow, &bestCol, -9999999, 9999999);
     assert(bestRow == 2);
     assert(bestCol == 6);
 }

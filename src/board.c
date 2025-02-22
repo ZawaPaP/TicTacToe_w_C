@@ -185,7 +185,7 @@ BOOL isAtLeastHalfOpenLine(Board *board, Cell start, Cell end, Direction dir) {
 }
 
 
-Cell getGapIdx(Board *board, LineIdx *line) {
+Cell getGapIdx(Board *board, LineInfo *line) {
     Cell result = {.r = -1, .c = -1};
     
     // gapがない場合は早期リターン
@@ -210,7 +210,7 @@ Cell getGapIdx(Board *board, LineIdx *line) {
     return result;
 }
 
-BOOL isFour(Board *board, LineIdx *line, char playerMark) {
+BOOL isFour(Board *board, LineInfo *line, char playerMark) {
     /* 
     四の定義は、一個の石を加えることで五にできるもの
     そのため、両サイドが塞がれているものは四ではない。
@@ -291,7 +291,7 @@ BOOL isMakingGreatFour(Board *board, int r, int c, char playerMark) {
         );
         
         for (int i = 0; i < linePatterns.pattern; i++) {
-            LineIdx line = linePatterns.lines[i];
+            LineInfo line = linePatterns.lines[i];
             // 黒番の場合長さが4ではない、またギャップがあると達四になり得ないため、early return
             if (playerMark == PLAYER_X && (line.length != 4 || line.hasGap == TRUE))
                 continue;
@@ -337,7 +337,7 @@ BOOL isMakingGreatFour(Board *board, int r, int c, char playerMark) {
 }
 
 
-BOOL isThree(Board *board, LineIdx *line, char playerMark) {
+BOOL isThree(Board *board, LineInfo *line, char playerMark) {
     /* 
     三であるかどうかの判定関数
     三とは、達四にする手段のある3のこと

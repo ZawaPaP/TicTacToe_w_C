@@ -6,7 +6,7 @@
 #include "cpu.h"
 
 int evaluate(Board *board, char playerMark);
-int negaMax(Board *board, int depth, char playerMark, int *bestRow, int *bestCol);
+int negaMax(Board *board, int depth, char playerMark, int *bestRow, int *bestCol, int alpha, int beta);
 
 
 void getCpuMove(int *row, int *col, Board *board, char playerMark) {
@@ -14,8 +14,7 @@ void getCpuMove(int *row, int *col, Board *board, char playerMark) {
     if (playerMark == PLAYER_O) {
         int bestRow = -1;
         int bestCol = -1;
-        int bestScore = negaMax(board, NEGA_MAX_DEPTH, playerMark, &bestRow, &bestCol);
-        printf("negaMax Score: %d, move %d, %d\n", bestScore, bestRow, bestCol);
+        negaMax(board, NEGA_MAX_DEPTH, playerMark, &bestRow, &bestCol, -9999999, 9999999);
         *row = bestRow;
         *col = bestCol;
         return;
@@ -32,28 +31,40 @@ void getCpuMove(int *row, int *col, Board *board, char playerMark) {
     }
 }
 
-int negaMax(Board *board, int depth, char playerMark, int* bestRow, int* bestCol) {
+int negaMax(Board *board, int depth, char playerMark, int* bestRow, int* bestCol, int alpha, int beta) {
     if (depth == 0 || isGameOver(board, bestRow, bestCol, playerMark)) {
         return evaluate(board, playerMark);
     }
 
     int maxScore = -9999999;
-    for (int i = 1; i <= BOARD_ROWS; i++) {
-        for (int j = 1; j <= BOARD_COLUMNS; j++) {
-            if (board->cells[i][j] == EMPTY_CELL) {
-                board->cells[i][j] = playerMark;
+    for (int r = 1; r <= BOARD_ROWS; r++) {
+        for (int c = 1; c <= BOARD_COLUMNS; c++) {
+            if (board->cells[r][c] == EMPTY_CELL) {
+                // 禁じ手チェック
+                if (playerMark == PLAYER_X && isProhibitedMove(board, r, c, playerMark))
+                    continue;  
+
+                board->cells[r][c] = playerMark;
 
                 char nextPlayerMark = (playerMark == PLAYER_X) ? PLAYER_O : PLAYER_X;
-                int score = -negaMax(board, depth - 1, nextPlayerMark, bestRow, bestCol);
+                int score = -negaMax(board, depth - 1, nextPlayerMark, bestRow, bestCol, -beta, -alpha);
                 if (score > maxScore) {
                     maxScore = score;
                     if (depth == NEGA_MAX_DEPTH) {
-                        *bestRow = i;
-                        *bestCol = j;
+                        *bestRow = r;
+                        *bestCol = c;
                     }
                 }
 
-                board->cells[i][j] = EMPTY_CELL;
+                board->cells[r][c] = EMPTY_CELL;
+
+
+                alpha = max(alpha, maxScore);
+                
+                // 枝刈りの条件: この時点でbeta以上のスコアが出ていれば、
+                // 親ノードはこの手を選択しないことが確定する
+                if (alpha >= beta)
+                    return maxScore;
             }
         }
     }
@@ -90,11 +101,12 @@ int __evaluateLengths(Board *board, int i, int j, int dx, int dy, char playerMar
     if (edge == CLOSED)
         return score;
 
+    if (length >= 5) {
+        printf("Found the Win move!!! %d %d\n", i, j);
+        score += WIN_POINTS;
+    }
     switch (length)
     {
-    case 5:
-        score += WIN_POINTS;
-        break;
     case 4:
         score += (edge == OPEN) ? OPEN_FOUR_POINTS : CLOSED_FOUR_POINTS;
         break;
@@ -111,6 +123,8 @@ int __evaluateLengths(Board *board, int i, int j, int dx, int dy, char playerMar
 }
 
 int __evaluatePositions(Board *board, int row, int col, char playerMark) {
+    // 周囲が空いているとポイントがつく
+    // さらに中央付近だと、CENTER_MULTIPLIER倍にしている
     int score = 0;
 
     static const int DIRS[8][2] = {
@@ -160,7 +174,6 @@ EvaluationScores __evaluateStones(Board *board, char playerMark) {
                     case 3: dx = 1; dy = -1; break; // 左斜め下
                 }
                 scores.lengthScore += __evaluateLengths(board, i, j, dx, dy, playerMark);
-                //scores.patternScore += __evaluatePatterns(board, i, j, dx, dy, playerMark);
             }
         }
     }
@@ -173,5 +186,5 @@ int evaluate(Board *board, char playerMark) {
     EvaluationScores playerScore = __evaluateStones(board, playerMark);
     EvaluationScores opponentScore = __evaluateStones(board, opponentPlayer);
 
-    return playerScore.lengthScore - opponentScore.lengthScore;
+    return playerScore.lengthScore + playerScore.positionScore - opponentScore.lengthScore - opponentScore.positionScore;
 }
