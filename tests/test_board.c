@@ -989,6 +989,191 @@ void testIsMakingGreatFour() {
     printf("All testIsMakingGreatFour passed!\n");
 }
 
+void testIsThree() {
+    Board board;
+    printf("Start testIsThree...\n");
+    
+    // テストケース:
+    // Ref (https://tokai-renjukai.pya.jp/siryo/RenjuKiso/RenjuKiso-1-2.pdf)
+    const char *testBoard1[] = {
+        NULL,
+        "..XXX....",
+        ".....O.X.",
+        ".........",
+        "..XX.X...",
+        "....X....",
+        ".....O...",
+        "........",
+        ".........",
+        ".O.OO....",
+    };
+    
+    initBoardWithStr(&board, testBoard1);
+    LineIdx line1 = {
+        .start = {.r = 1, .c = 3},
+        .end = {.r = 1, .c = 5},
+        .dir = {.dx = 0, .dy = 1},
+        .hasGap = FALSE,
+        .length = 3
+    };
+    LineIdx line2 = {
+        .start = {.r = 2, .c = 8},
+        .end = {.r = 5, .c = 5},
+        .dir = {.dx = 1, .dy = -1},
+        .hasGap =TRUE, 
+        .length = 3
+    };
+    LineIdx line3 = {
+        .start = {.r = 4, .c = 3},
+        .end = {.r = 4, .c = 6},
+        .dir = {.dx = 0, .dy = 1},
+        .hasGap = TRUE,
+        .length = 3
+    };
+    LineIdx line4 = {
+        .start = {.r = 9, .c = 2},
+        .end = {.r = 9, .c = 5},
+        .dir = {.dx = 0, .dy = 1},
+        .hasGap = TRUE,
+        .length = 3
+    };
+
+    assert(isThree(&board, &line1, PLAYER_X) == TRUE);
+    assert(isThree(&board, &line2, PLAYER_X) == TRUE);
+    assert(isThree(&board, &line3, PLAYER_X) == TRUE);
+    assert(isThree(&board, &line4, PLAYER_O) == TRUE);
+
+    const char *testBoard2[] = {
+        NULL,
+        ".XXX.O...",
+        ".........",
+        ".X..XXX.O",
+        ".........",
+        ".XX.X.X.O",
+        ".........",
+        ".........",
+        ".........",
+        ".........",
+    };
+    // 1行目は夏止め、
+    // 3行目は長連筋の夏止め
+    // 5行目は長連筋でそれぞれ三とはならない
+    
+    initBoardWithStr(&board, testBoard2);
+    LineIdx line5 = {
+        .start = {.r = 1, .c = 2},
+        .end = {.r = 1, .c = 4},
+        .dir = {.dx = 0, .dy = 1},
+        .hasGap = FALSE,
+        .length = 3
+    };
+    LineIdx line6 = {
+        .start = {.r = 3, .c = 5},
+        .end = {.r = 3, .c = 7},
+        .dir = {.dx = 0, .dy = 1},
+        .hasGap =FALSE, 
+        .length = 3
+    };
+    LineIdx line7 = {
+        .start = {.r = 5, .c = 2},
+        .end = {.r = 5, .c = 5},
+        .dir = {.dx = 0, .dy = 1},
+        .hasGap = TRUE,
+        .length = 3
+    };
+
+    assert(isThree(&board, &line5, PLAYER_X) == FALSE);
+    assert(isThree(&board, &line6, PLAYER_X) == FALSE);
+    assert(isThree(&board, &line7, PLAYER_X) == FALSE);
+
+    const char *testBoard3[] = {
+        NULL,
+        ".........",
+        ".XX.@....",
+        "..OOB.X..",
+        "...XXOX..",
+        "...OXE.X.",
+        "....#....",
+        "...X.....",
+        "....X....",
+        ".........",
+    };
+    // Bにおいても、@が三三の禁手のため、達四にできない
+    // Eにおいても、#が四四の禁手のため、達四にできない
+
+    initBoardWithStr(&board, testBoard3);
+    board.cells[3][5] = PLAYER_X;
+
+    LineIdx line8 = {
+        .start = {.r = 3, .c = 5},
+        .end = {.r = 5, .c = 5},
+        .dir = {.dx = 1, .dy = 0},
+        .hasGap = FALSE,
+        .length = 3};
+
+    assert(isThree(&board, &line8, PLAYER_X) == FALSE);
+
+    board.cells[3][5] = EMPTY_CELL;
+    board.cells[5][6] = PLAYER_X;
+
+    LineIdx line9 = {
+        .start = {.r = 4, .c = 7},
+        .end = {.r = 7, .c = 4},
+        .dir = {.dx = 1, .dy = -1},
+        .hasGap = TRUE,
+        .length = 3};
+
+    assert(isThree(&board, &line9, PLAYER_X) == FALSE);
+    printf("All testIsThree passed!\n");
+}
+
+void testIsMakingDoubleThree() {
+    Board board;
+    printf("Start testIsMakingDoubleThree...\n");
+    
+    // テストケース:
+    // Ref (https://tokai-renjukai.pya.jp/siryo/RenjuKiso/RenjuKiso-1-2.pdf)
+    const char *testBoard1[] = {
+        NULL,
+        ".........",
+        "...X.....",
+        "..X@X.O..",
+        ".O.X.OO..",
+        "....@X.X.",
+        "...#.....",
+        "....O....",
+        ".........",
+        ".........",
+    };
+
+    // @は黒の三三、#は白の三三
+    
+    initBoardWithStr(&board, testBoard1);
+    assert(isMakingDoubleThree(&board, 3, 4, PLAYER_X) == TRUE);
+    assert(isMakingDoubleThree(&board, 5, 5, PLAYER_X) == TRUE);
+    assert(isMakingDoubleThree(&board, 6, 4, PLAYER_O) == TRUE);
+
+    const char *testBoard2[] = {
+        NULL,
+        ".........",
+        ".X.......",
+        "X...O....",
+        ".X.OO#...",
+        "O..X.X@..",
+        ".......O.",
+        "..O...X..",
+        "......X..",
+        ".........",
+    };
+
+    // @は黒の三三、#は白の三三
+    
+    initBoardWithStr(&board, testBoard2);
+    assert(isMakingDoubleThree(&board, 4, 6, PLAYER_O) == TRUE);
+    assert(isMakingDoubleThree(&board, 5, 7, PLAYER_X) == TRUE);
+
+    printf("Start testIsMakingDoubleThree...\n");
+}
 
 void runBoardTests() {
     printf("Start runBoardTests...\n");
@@ -1005,5 +1190,7 @@ void runBoardTests() {
     testIsFour();
     testIsMakingDoubleFour();
     testIsMakingGreatFour();
+    testIsThree();
+    testIsMakingDoubleThree();
     printf("Finished runBoardTests.\n");
 }

@@ -11,6 +11,8 @@ static const Direction DIRS[4] = {
 
 static const int dirLength = 4;
 
+BOOL isProhibitedMove(Board *board, int r, int c, char playerMark);
+
 void initBoard(Board *board) {
     size_t i, j;
     for (i = 1; i <= BOARD_ROWS; i++) {
@@ -334,6 +336,86 @@ BOOL isMakingGreatFour(Board *board, int r, int c, char playerMark) {
     return result;
 }
 
+
+BOOL isThree(Board *board, LineIdx *line, char playerMark) {
+    /* 
+    三であるかどうかの判定関数
+    三とは、達四にする手段のある3のこと
+    */
+    if (line->length != 3)
+        return FALSE;
+
+    if (!isAtLeastHalfOpenLine(board, line->start, line->end, line->dir))
+        return FALSE;
+
+    // gapがある場合は、そこに石を置いて達四になるかを判定
+    if (line->hasGap) {
+        Cell gap = getGapIdx(board, line);
+        return (
+            !isProhibitedMove(board, gap.r, gap.c, playerMark) && 
+            isMakingGreatFour(board, gap.r, gap.c, playerMark)
+        );
+    }
+
+    // gapがない場合は、両側の空いているマスに置いて五になるかを確認
+    Cell leftEdge = {
+        .r = line->start.r - line->dir.dx, 
+        .c = line->start.c - line->dir.dy
+    };
+    Cell rightEdge = {
+        .r = line->end.r + line->dir.dx, 
+        .c = line->end.c + line->dir.dy
+    };
+
+    // 両端のマスが盤内かつ空いているかをチェック
+    BOOL canPlaceLeft = isInBoard(leftEdge.r, leftEdge.c) && 
+                       board->cells[leftEdge.r][leftEdge.c] == EMPTY_CELL;
+    BOOL canPlaceRight = isInBoard(rightEdge.r, rightEdge.c) && 
+                        board->cells[rightEdge.r][rightEdge.c] == EMPTY_CELL;
+
+    // どちらかの端に置いて達四になるかをチェック
+    return (
+            (
+                canPlaceLeft && 
+                !isProhibitedMove(board, leftEdge.r, leftEdge.c, playerMark) &&
+                isMakingGreatFour(board, leftEdge.r, leftEdge.c, playerMark)
+            ) ||
+           (
+                canPlaceRight && 
+                !isProhibitedMove(board, rightEdge.r, rightEdge.c, playerMark) &&
+                isMakingGreatFour(board, rightEdge.r, rightEdge.c, playerMark)
+            )
+        );
+}
+
+BOOL isMakingDoubleThree(Board *board, int r, int c, char playerMark){
+    // r, cに石を置いたときに、三三を作るかどうかの判定関数
+
+    //一時的にボードを作り石を置いてみる
+    Board tmpBoard = *board;
+    tmpBoard.cells[r][c] = playerMark;
+    
+    int threeLineCount = 0;
+
+    // 4方向それぞれについて四を数える
+    for (int dir = 0; dir < dirLength; dir++) {
+        LinePatterns linePatterns = countContinuousStonesWithGap(
+            &tmpBoard, r, c, DIRS[dir].dx, DIRS[dir].dy, playerMark
+        );
+        
+        for (int i = 0; i < linePatterns.pattern; i++) {
+            if (isThree(&tmpBoard, &linePatterns.lines[i], playerMark)) {
+                threeLineCount++;
+                if (threeLineCount > 1)
+                    return TRUE;
+            }
+        }
+    }
+    
+    return FALSE;
+}
+
+
 // 禁じ手かどうかの判定関数
 BOOL isProhibitedMove(Board *board, int r, int c, char playerMark) {
     if (playerMark != PLAYER_X)
@@ -345,7 +427,9 @@ BOOL isProhibitedMove(Board *board, int r, int c, char playerMark) {
 
     return (
         isMakingOverLine(board, r, c, playerMark) ||
-        isMakingDoubleFour(board, r, c, playerMark));
+        isMakingDoubleFour(board, r, c, playerMark) ||
+        isMakingDoubleThree(board, r, c, playerMark)
+        );
 }
 
 /* BOOL isDoubleThree(Board *board, int row, int col, int dx, int dy, char playerMark){
@@ -360,7 +444,7 @@ BOOL isProhibitedMove(Board *board, int r, int c, char playerMark) {
         if (linePatterns.pattern == 0) 
             continue;
         for (int i = 0; i < linePatterns.pattern; i++) {
-            if (isEffectiveThree(board, &linePatterns.lines[i]))
+            if (isThree(board, &linePatterns.lines[i]))
                 threeCounts++;
         }
         if (threeCounts > 1)
