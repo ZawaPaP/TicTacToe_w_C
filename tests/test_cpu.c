@@ -139,8 +139,8 @@ void testEvaluateMultiLine(TestResults* results) {
     board.cells[4][7] = PLAYER_X;
     EvaluationScores scores = __evaluateStones(&board, PLAYER_X);
 
-    test_assert(scores.lengthScore == CLOSED_FOUR_POINTS * 2 + CLOSED_TWO_POINTS * 2, 
-                "Multi line should score CLOSED_FOUR_POINTS * 2 + CLOSED_TWO_POINTS * 2", results);
+    test_assert(scores.lengthScore == CLOSED_FOUR_POINTS * 2 + CLOSED_TWO_POINTS * 4,
+                "Multi line should score CLOSED_FOUR_POINTS * 2 + CLOSED_TWO_POINTS * 4", results);
     test_assert(scores.positionScore == 42, 
                 "Position score should be 42", results);
     

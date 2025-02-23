@@ -72,51 +72,75 @@ int negaMax(Board *board, int depth, char playerMark, int* bestRow, int* bestCol
 }
 
 
-int __evaluateLengths(Board *board, int i, int j, int dx, int dy, char playerMark) {
+int __evaluateLengths(Board *board, int r, int c, char playerMark) {
     int score = 0;
 
-    // lineの始点ではない場合、すでにカウント済みのためSkip
-    int prevX = i - dx;
-    int prevY = j - dy;
-    if (isInBoard(prevX, prevY) && board->cells[prevX][prevY] == playerMark)
-        return score;
+    static const Direction DIRS[4] = {
+    {1, 0},   // 垂直方向 (↓)
+    {0, 1},   // 水平方向 (→)
+    {1, 1},   // 右下がり斜め (↘)
+    {1, -1}   // 左下がり斜め (↙︎)
+    };
 
-    int length = 1;
-    int nextX = i + dx;
-    int nextY = j + dy;
-    while (isInBoard(nextX, nextY) && board->cells[nextX][nextY] == playerMark)
-    {
-        length++;
-        nextX += dx;
-        nextY += dy;
-    }
-    EDGE_STATUS edge = OPEN;
+    static const int dirLength = 4;
 
-    if (!isInBoard(prevX, prevY) || board->cells[prevX][prevY] != EMPTY_CELL) 
-        edge++;
+    for (int dir = 0; dir < dirLength; dir++) {
+        int dx = DIRS[dir].dx;
+        int dy = DIRS[dir].dy;
 
-    if (!isInBoard(nextX, nextY) || board->cells[nextX][nextY] != EMPTY_CELL) 
-        edge++;
+        // lineの始点ではない場合、すでにカウント済みのためSkip
+        int prevX = r - dx;
+        int prevY = c - dy;
+        if (isInBoard(prevX, prevY) && board->cells[prevX][prevY] == playerMark)
+            continue;
 
-    if (edge == CLOSED)
-        return score;
+        LinePatterns patterns = countContinuousStonesWithGap(board, r, c, dx, dy, playerMark);
 
-    if (length >= 5) {
-        score += WIN_POINTS;
-    }
-    switch (length)
-    {
-    case 4:
-        score += (edge == OPEN) ? OPEN_FOUR_POINTS : CLOSED_FOUR_POINTS;
-        break;
-    case 3:
-        score += (edge == OPEN) ? OPEN_THREE_POINTS : CLOSED_THREE_POINTS;
-        break;
-    case 2:
-        score += (edge == OPEN) ? OPEN_TWO_POINTS : CLOSED_TWO_POINTS;
-        break;
-    default:
-        break;
+        for (int p = 0; p < patterns.pattern; p++) {
+            LineInfo line = patterns.lines[p];
+            
+            // 両端の状態をチェック
+            int prevX = line.start.r - line.dir.dx;
+            int prevY = line.start.c - line.dir.dy;
+            int nextX = line.end.r + line.dir.dx;
+            int nextY = line.end.c + line.dir.dy;
+            
+            BOOL isPrevOpen = isInBoard(prevX, prevY) && 
+                            board->cells[prevX][prevY] == EMPTY_CELL;
+            BOOL isNextOpen = isInBoard(nextX, nextY) && 
+                            board->cells[nextX][nextY] == EMPTY_CELL;
+
+            BOOL fullOpen = !line.hasGap && isPrevOpen && isNextOpen;
+            BOOL halfOpen = line.hasGap || (isPrevOpen || isNextOpen);
+
+            if (line.length >= 5) {
+                if (!line.hasGap) {
+                    // 勝利
+                    score += WIN_POINTS;
+                } else {
+                    // gapがある場合は、そこにおけたら勝利なので、片四と同じ
+                    score += CLOSED_FOUR_POINTS;
+                }
+            } else if (line.length == 4) {
+                if (fullOpen) {
+                    score += OPEN_FOUR_POINTS;
+                } else if (halfOpen) {
+                    score += CLOSED_FOUR_POINTS;
+                }
+            } else if (line.length == 3) {
+                if (fullOpen) {
+                    score += OPEN_THREE_POINTS;
+                } else if (halfOpen) {
+                    score += CLOSED_THREE_POINTS;
+                }
+            } else if (line.length == 2) {
+                if (fullOpen) {
+                    score += OPEN_TWO_POINTS; 
+                } else if (halfOpen) {
+                    score += CLOSED_TWO_POINTS;
+                }
+            }
+        }
     }
     return score;
 }
@@ -158,22 +182,13 @@ int __evaluatePositions(Board *board, int row, int col, char playerMark) {
 EvaluationScores __evaluateStones(Board *board, char playerMark) {
     EvaluationScores scores = {0, 0, 0};
 
-    for (int i = 1; i <= BOARD_ROWS; i++) {
-        for (int j = 1; j <= BOARD_COLUMNS; j++) {
-            if (board->cells[i][j] != playerMark)
+    for (int row = 1; row <= BOARD_ROWS; row++) {
+        for (int col = 1; col <= BOARD_COLUMNS; col++) {
+            if (board->cells[row][col] != playerMark)
                 continue;
-            scores.positionScore += __evaluatePositions(board, i, j, playerMark);
+            scores.positionScore += __evaluatePositions(board, row, col, playerMark);
 
-            for (int d = 0; d < 4; d++) {
-                int dx = 0, dy = 0;
-                switch(d) {
-                    case 0: dx = 0; dy = 1; break;  // 右
-                    case 1: dx = 1; dy = 0; break;  // 下
-                    case 2: dx = 1; dy = 1; break;  // 右斜め下
-                    case 3: dx = 1; dy = -1; break; // 左斜め下
-                }
-                scores.lengthScore += __evaluateLengths(board, i, j, dx, dy, playerMark);
-            }
+            scores.lengthScore += __evaluateLengths(board, row, col, playerMark);
         }
     }
     return scores;

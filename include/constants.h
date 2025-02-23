@@ -75,15 +75,6 @@ typedef struct {
     MODE gameMode;
 } Game;
 
-
-typedef enum
-{
-    OPEN = 0,
-    SEMI_CLOSE = 1,
-    CLOSED = 2
-} EDGE_STATUS;
-
-
 // 方向を表す構造体
 typedef struct
 {
