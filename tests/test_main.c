@@ -2,19 +2,19 @@
 #include "test_utils.h"
 #include "test_queue.h"
 #include "test_board.h"
-#include "test_plays.h"
+#include "test_ui.h"
 #include "test_game.h"
 #include "test_cpu.h"
 
 int main() {
-    printf("\nStart running the test...\n\n");
+    fprintf(stderr, "Starting All Tests...\n\n");
     runUtilsTests();
     runQueueTests();
     runBoardTests();
-    runPlaysTests();
+    runUiTests();
     runGameTests();
     runCPUTests();
 
-    printf("\nFinished all tests.\n\n");
+   fprintf(stderr, "\nAll Tests Completed.\n");
     return 0;
 }

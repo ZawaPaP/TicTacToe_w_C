@@ -1,19 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include "../include/board.h"
 #include "test_utils.h"
 #include "test_board.h"
 
-
-
-void testInitBoard()
-{
-    printf("Start testInitBoard...\n");
+void testInitBoard(TestResults* results) {
+    test_begin("InitBoard");
 
     Board board;
-
     board.cells[1][1] = PLAYER_X;
     board.cells[4][6] = PLAYER_O;
     board.cells[8][8] = PLAYER_X;
@@ -22,17 +17,16 @@ void testInitBoard()
 
     for (int i = 1; i <= BOARD_ROWS; i++) {
         for (int j = 1; j <= BOARD_COLUMNS; j++) {
-            if (board.cells[i][j] != EMPTY_CELL) {
-                printf("Error: %d, %d is not empty.\n", i, j);
-                assert(board.cells[i][j] == EMPTY_CELL);
-            }
+            test_assert(board.cells[i][j] == EMPTY_CELL,
+                       "All cells should be empty after initialization", results);
         }
     }
-    printf("test testInitBoard success.\n");
+
+    test_end("InitBoard");
 }
 
-void testIsWinMove() {
-    printf("Start testIsWinMove...\n");
+void testIsWinMove(TestResults* results) {
+    test_begin("IsWinMove");
 
     Board board;
 
@@ -51,8 +45,10 @@ void testIsWinMove() {
     };
     
     initBoardWithStr(&board, testBoard1);
-    assert(isWinMove(&board, 2, 7, PLAYER_X) == TRUE);
-    assert(isWinMove(&board, 9, 2, PLAYER_O) == TRUE);
+    test_assert(isWinMove(&board, 2, 7, PLAYER_X) == TRUE,
+                "Horizontal win pattern should be detected", results);
+    test_assert(isWinMove(&board, 9, 2, PLAYER_O) == TRUE,
+                "Horizontal win pattern for PLAYER_O should be detected", results);
 
     // 左上隅、FALSE case & TRUE case
     const char *testBoard2[] = {
@@ -69,8 +65,10 @@ void testIsWinMove() {
     };
     
     initBoardWithStr(&board, testBoard2);
-    assert(isWinMove(&board, 1, 1, PLAYER_O) == FALSE);
-    assert(isWinMove(&board, 1, 1, PLAYER_X) == TRUE);
+    test_assert(isWinMove(&board, 1, 1, PLAYER_O) == FALSE,
+                "Should not detect win for PLAYER_O", results);
+    test_assert(isWinMove(&board, 1, 1, PLAYER_X) == TRUE,
+                "Should detect win for PLAYER_X", results);
 
     // 長さが5を超えるケース
     const char *testBoard3[] = {
@@ -87,8 +85,10 @@ void testIsWinMove() {
     };
     
     initBoardWithStr(&board, testBoard3);
-    assert(isWinMove(&board, 5, 1, PLAYER_X) == FALSE);
-    assert(isWinMove(&board, 9, 9, PLAYER_O) == TRUE);
+    test_assert(isWinMove(&board, 5, 1, PLAYER_X) == FALSE,
+                "Should not detect win for PLAYER_X", results);
+    test_assert(isWinMove(&board, 9, 9, PLAYER_O) == TRUE,
+                "Should detect win for PLAYER_O", results);
 
     //
     const char *testBoard4[] = {
@@ -105,19 +105,16 @@ void testIsWinMove() {
     };
     
     initBoardWithStr(&board, testBoard4);
-    assert(isWinMove(&board, 3, 6, PLAYER_X) == TRUE);
+    test_assert(isWinMove(&board, 3, 6, PLAYER_X) == TRUE,
+                "Should detect win for PLAYER_X", results);
 
-
-    printf("Success testIsWinMove.\n");
+    test_end("IsWinMove");
 }
 
-
-void testIsMakingOverLine() {
-    printf("Start testIsMakingOverLine...\n");
+void testIsMakingOverLine(TestResults* results) {
+    test_begin("IsMakingOverLine");
 
     Board board;
-
-    // 横に5つ並んでいる
     const char *testBoard1[] = {
         NULL,
         ".........",
@@ -132,8 +129,10 @@ void testIsMakingOverLine() {
     };
     
     initBoardWithStr(&board, testBoard1);
-    assert(isMakingOverLine(&board, 2, 7, PLAYER_X) == TRUE);
-    assert(isMakingOverLine(&board, 9, 2, PLAYER_O) == FALSE);
+    test_assert(isMakingOverLine(&board, 2, 7, PLAYER_X) == TRUE,
+                "Should detect overline for PLAYER_X", results);
+    test_assert(isMakingOverLine(&board, 9, 2, PLAYER_O) == FALSE,
+                "Should not detect overline for PLAYER_O", results);
 
     const char *testBoard2[] = {
         NULL,
@@ -149,15 +148,18 @@ void testIsMakingOverLine() {
     };
     
     initBoardWithStr(&board, testBoard2);
-    assert(isMakingOverLine(&board, 5, 1, PLAYER_X) == TRUE);
-    assert(isMakingOverLine(&board, 9, 9, PLAYER_X) == TRUE);
+    test_assert(isMakingOverLine(&board, 5, 1, PLAYER_X) == TRUE,
+                "Should detect overline for PLAYER_X", results);
+    test_assert(isMakingOverLine(&board, 9, 9, PLAYER_X) == TRUE,
+                "Should detect overline for PLAYER_X", results);
 
-    printf("Success testIsMakingOverLine.\n");
+    test_end("IsMakingOverLine");
 }
 
-void testCountContinuousStonesWithGap() {
+void testCountContinuousStonesWithGap(TestResults* results) {
+    test_begin("CountContinuousStonesWithGap");
+
     Board board;
-    printf("Start testCountContinuousStonesWithGap...\n");
     
     // テストケース1: 左右方向に2種類のラインができるケース
     const char *testBoard1[] = {
@@ -175,17 +177,28 @@ void testCountContinuousStonesWithGap() {
     
     initBoardWithStr(&board, testBoard1);
     LinePatterns result1 = countContinuousStonesWithGap(&board, 2, 4, 0, 1, PLAYER_X);
-    assert(result1.pattern == 2);
-    assert(result1.lines[0].start.r == 2);
-    assert(result1.lines[0].start.c == 1);
-    assert(result1.lines[0].end.r == 2);
-    assert(result1.lines[0].end.c == 4);
-    assert(result1.lines[0].dir.dx == 0);
-    assert(result1.lines[0].dir.dy == 1);
-    assert(result1.lines[1].start.r == 2);
-    assert(result1.lines[1].start.c == 3);
-    assert(result1.lines[1].end.r == 2);
-    assert(result1.lines[1].end.c == 6);
+    test_assert(result1.pattern == 2,
+                "Should detect 2 continuous stones with gap", results);
+    test_assert(result1.lines[0].start.r == 2,
+                "Should detect correct start row for line 1", results);
+    test_assert(result1.lines[0].start.c == 1,
+                "Should detect correct start column for line 1", results);
+    test_assert(result1.lines[0].end.r == 2,
+                "Should detect correct end row for line 1", results);
+    test_assert(result1.lines[0].end.c == 4,
+                "Should detect correct end column for line 1", results);
+    test_assert(result1.lines[0].dir.dx == 0,
+                "Should detect correct dx for line 1", results);
+    test_assert(result1.lines[0].dir.dy == 1,
+                "Should detect correct dy for line 1", results);
+    test_assert(result1.lines[1].start.r == 2,
+                "Should detect correct start row for line 2", results);
+    test_assert(result1.lines[1].start.c == 3,
+                "Should detect correct start column for line 2", results);
+    test_assert(result1.lines[1].end.r == 2,
+                "Should detect correct end row for line 2", results);
+    test_assert(result1.lines[1].end.c == 6,
+                "Should detect correct end column for line 2", results);
     
 
     // テストケース2: 1種類のみのケース (gapなし)
@@ -204,13 +217,20 @@ void testCountContinuousStonesWithGap() {
     
     initBoardWithStr(&board, testBoard2);
     LinePatterns result2 = countContinuousStonesWithGap(&board, 2, 4, 0, 1, PLAYER_X);
-    assert(result2.pattern == 1);
-    assert(result2.lines[0].start.r == 2);
-    assert(result2.lines[0].start.c == 3);
-    assert(result2.lines[0].end.r == 2);
-    assert(result2.lines[0].end.c == 5);
-    assert(result2.lines[0].dir.dx == 0);
-    assert(result2.lines[0].dir.dy == 1);
+    test_assert(result2.pattern == 1,
+                "Should detect 1 continuous stone with gap", results);
+    test_assert(result2.lines[0].start.r == 2,
+                "Should detect correct start row for line 1", results);
+    test_assert(result2.lines[0].start.c == 3,
+                "Should detect correct start column for line 1", results);
+    test_assert(result2.lines[0].end.r == 2,
+                "Should detect correct end row for line 1", results);
+    test_assert(result2.lines[0].end.c == 5,
+                "Should detect correct end column for line 1", results);
+    test_assert(result2.lines[0].dir.dx == 0,
+                "Should detect correct dx for line 1", results);
+    test_assert(result2.lines[0].dir.dy == 1,
+                "Should detect correct dy for line 1", results);
     
 
         // テストケース3: 片側にしかgapがないケース
@@ -229,22 +249,29 @@ void testCountContinuousStonesWithGap() {
     
     initBoardWithStr(&board, testBoard3);
     LinePatterns result3 = countContinuousStonesWithGap(&board, 2, 4, 0, 1, PLAYER_X);
-    assert(result3.pattern == 1);
-    assert(result3.lines[0].start.r == 2);
-    assert(result3.lines[0].start.c == 1);
-    assert(result3.lines[0].end.r == 2);
-    assert(result3.lines[0].end.c == 6);
-    assert(result3.lines[0].dir.dx == 0);
-    assert(result3.lines[0].dir.dy == 1);
+    test_assert(result3.pattern == 1,
+                "Should detect 1 continuous stone with gap", results);
+    test_assert(result3.lines[0].start.r == 2,
+                "Should detect correct start row for line 1", results);
+    test_assert(result3.lines[0].start.c == 1,
+                "Should detect correct start column for line 1", results);
+    test_assert(result3.lines[0].end.r == 2,
+                "Should detect correct end row for line 1", results);
+    test_assert(result3.lines[0].end.c == 6,
+                "Should detect correct end column for line 1", results);
+    test_assert(result3.lines[0].dir.dx == 0,
+                "Should detect correct dx for line 1", results);
+    test_assert(result3.lines[0].dir.dy == 1,
+                "Should detect correct dy for line 1", results);
     
 
-    printf("All testCountContinuousStonesWithGap passed!\n");
+    test_end("CountContinuousStonesWithGap");
 }
 
-void testIsOpenLine() {
-    Board board;
+void testIsOpenLine(TestResults* results) {
+    test_begin("IsOpenLine");
 
-    printf("Start testIsOpenLine...\n");
+    Board board;
 
     const char *testBoard1[] = {
             NULL,
@@ -275,10 +302,14 @@ void testIsOpenLine() {
     Cell end4 = {.r = 8, .c = 8};
     Direction dir4 = {.dx = 1, .dy = 1};
 
-    assert(isOpenLine(&board, start1, end1, dir1) == TRUE);
-    assert(isOpenLine(&board, start2, end2, dir2) == TRUE);
-    assert(isOpenLine(&board, start3, end3, dir3) == TRUE);
-    assert(isOpenLine(&board, start4, end4, dir4) == TRUE);
+    test_assert(isOpenLine(&board, start1, end1, dir1) == TRUE,
+                "Should detect open line", results);
+    test_assert(isOpenLine(&board, start2, end2, dir2) == TRUE,
+                "Should detect open line", results);
+    test_assert(isOpenLine(&board, start3, end3, dir3) == TRUE,
+                "Should detect open line", results);
+    test_assert(isOpenLine(&board, start4, end4, dir4) == TRUE,
+                "Should detect open line", results);
 
 
     const char *testBoard2[] = {
@@ -310,21 +341,22 @@ void testIsOpenLine() {
     Cell end8 = {.r = 8, .c = 8};
     Direction dir8 = {.dx = 1, .dy = 1};
 
-    assert(isOpenLine(&board, start5, end5, dir5) == FALSE);
-    assert(isOpenLine(&board, start6, end6, dir6) == FALSE);
-    assert(isOpenLine(&board, start7, end7, dir7) == FALSE);
-    assert(isOpenLine(&board, start8, end8, dir8) == FALSE);
+    test_assert(isOpenLine(&board, start5, end5, dir5) == FALSE,
+                "Should not detect open line", results);
+    test_assert(isOpenLine(&board, start6, end6, dir6) == FALSE,
+                "Should not detect open line", results);
+    test_assert(isOpenLine(&board, start7, end7, dir7) == FALSE,
+                "Should not detect open line", results);
+    test_assert(isOpenLine(&board, start8, end8, dir8) == FALSE,
+                "Should not detect open line", results);
 
-    printf("All testIsOpenLine passed!\n");
-
+    test_end("IsOpenLine");
 }
 
+void testIsHalfOpenLine(TestResults* results) {
+    test_begin("IsHalfOpenLine");
 
-
-void testIsHalfOpenLine() {
     Board board;
-
-    printf("Start testIsHalfOpenLine...\n");
 
     const char *testBoard1[] = {
             NULL,
@@ -355,18 +387,22 @@ void testIsHalfOpenLine() {
     Cell end4 = {.r = 8, .c = 8};
     Direction dir4 = {.dx = 1, .dy = 1};
 
-    assert(isAtLeastHalfOpenLine(&board, start1, end1, dir1) == TRUE);
-    assert(isAtLeastHalfOpenLine(&board, start2, end2, dir2) == FALSE);
-    assert(isAtLeastHalfOpenLine(&board, start3, end3, dir3) == TRUE);
-    assert(isAtLeastHalfOpenLine(&board, start4, end4, dir4) == TRUE);
+    test_assert(isAtLeastHalfOpenLine(&board, start1, end1, dir1) == TRUE,
+                "Should detect half open line", results);
+    test_assert(isAtLeastHalfOpenLine(&board, start2, end2, dir2) == FALSE,
+                "Should not detect half open line", results);
+    test_assert(isAtLeastHalfOpenLine(&board, start3, end3, dir3) == TRUE,
+                "Should detect half open line", results);
+    test_assert(isAtLeastHalfOpenLine(&board, start4, end4, dir4) == TRUE,
+                "Should detect half open line", results);
 
-    printf("All testIsHalfOpenLine passed!\n");
-
+    test_end("IsHalfOpenLine");
 }
 
-void testGetGapIdx() {
+void testGetGapIdx(TestResults* results) {
+    test_begin("GetGapIdx");
+
     Board board;
-    printf("Start testGetGapIdx...\n");
     
     // テストケース1: 水平方向のgap
     const char *testBoard1[] = {
@@ -391,8 +427,10 @@ void testGetGapIdx() {
     };
     
     Cell gap1 = getGapIdx(&board, &line1);
-    assert(gap1.r == 2);
-    assert(gap1.c == 5);
+    test_assert(gap1.r == 2,
+                "Should detect correct row for gap", results);
+    test_assert(gap1.c == 5,
+                "Should detect correct column for gap", results);
     
     // テストケース2: gapなしのライン
     const char *testBoard2[] = {
@@ -417,8 +455,10 @@ void testGetGapIdx() {
     };
     
     Cell gap2 = getGapIdx(&board, &line2);
-    assert(gap2.r == -1);
-    assert(gap2.c == -1);
+    test_assert(gap2.r == -1,
+                "Should not detect gap", results);
+    test_assert(gap2.c == -1,
+                "Should not detect gap", results);
     
     // テストケース3: 斜め方向のgap
     const char *testBoard3[] = {
@@ -443,15 +483,18 @@ void testGetGapIdx() {
     };
     
     Cell gap3 = getGapIdx(&board, &line3);
-    assert(gap3.r == 4);
-    assert(gap3.c == 5);
+    test_assert(gap3.r == 4,
+                "Should detect correct row for gap", results);
+    test_assert(gap3.c == 5,
+                "Should detect correct column for gap", results);
     
-    printf("All testGetGapIdx passed!\n");
+    test_end("GetGapIdx");
 }
 
-void testIsFour() {
+void testIsFour(TestResults* results) {
+    test_begin("IsFour");
+
     Board board;
-    printf("Start testIsFour...\n");
     
     // テストケース1: gapあり、なしの四
     const char *testBoard1[] = {
@@ -482,9 +525,11 @@ void testIsFour() {
         .dir = {.dx = 1, .dy = 1},
         .hasGap = FALSE,
         .length = 4
-};
-    assert(isFour(&board, &line1, PLAYER_X) == TRUE);
-    assert(isFour(&board, &line2, PLAYER_X) == TRUE);
+    };
+    test_assert(isFour(&board, &line1, PLAYER_X) == TRUE,
+                "Should detect four", results);
+    test_assert(isFour(&board, &line2, PLAYER_X) == TRUE,
+                "Should detect four", results);
 
     // テストケース2: 四ではないケース
     const char *testBoard2[] = {
@@ -524,16 +569,20 @@ void testIsFour() {
         .hasGap = FALSE,
         .length = 4
     };
-    assert(isFour(&board, &line3, PLAYER_X) == FALSE);
-    assert(isFour(&board, &line4, PLAYER_X) == FALSE);
-    assert(isFour(&board, &line5, PLAYER_X) == FALSE);
+    test_assert(isFour(&board, &line3, PLAYER_X) == FALSE,
+                "Should not detect four", results);
+    test_assert(isFour(&board, &line4, PLAYER_X) == FALSE,
+                "Should not detect four", results);
+    test_assert(isFour(&board, &line5, PLAYER_X) == FALSE,
+                "Should not detect four", results);
     
-    printf("All testIsFour passed!\n");
+    test_end("IsFour");
 }
 
-void testIsMakingDoubleFour() {
+void testIsMakingDoubleFour(TestResults* results) {
+    test_begin("IsMakingDoubleFour");
+
     Board board;
-    printf("Start testIsMakingDoubleFour...\n");
     
     // テストケース1: 四四
     const char *testBoard1[] = {
@@ -550,8 +599,10 @@ void testIsMakingDoubleFour() {
     };
     
     initBoardWithStr(&board, testBoard1);
-    assert(isMakingDoubleFour(&board, 2, 3, PLAYER_X) == TRUE);
-    assert(isMakingDoubleFour(&board, 9, 7, PLAYER_X) == TRUE);
+    test_assert(isMakingDoubleFour(&board, 2, 3, PLAYER_X) == TRUE,
+                "Should detect double four", results);
+    test_assert(isMakingDoubleFour(&board, 9, 7, PLAYER_X) == TRUE,
+                "Should detect double four", results);
     
     // テストケース2: 四が1つだけ
     const char *testBoard2[] = {
@@ -568,8 +619,10 @@ void testIsMakingDoubleFour() {
     };
     
     initBoardWithStr(&board, testBoard2);
-    assert(isMakingDoubleFour(&board, 2, 3, PLAYER_X) == FALSE);
-    assert(isMakingDoubleFour(&board, 7, 6, PLAYER_X) == FALSE);
+    test_assert(isMakingDoubleFour(&board, 2, 3, PLAYER_X) == FALSE,
+                "Should not detect double four", results);
+    test_assert(isMakingDoubleFour(&board, 7, 6, PLAYER_X) == FALSE,
+                "Should not detect double four", results);
 
 
     // テストケース3: 五を作っていても、この関数は気にせず四四を判定する
@@ -587,7 +640,8 @@ void testIsMakingDoubleFour() {
     };
     
     initBoardWithStr(&board, testBoard3);
-    assert(isMakingDoubleFour(&board, 2, 3, PLAYER_X) == TRUE);
+    test_assert(isMakingDoubleFour(&board, 2, 3, PLAYER_X) == TRUE,
+                "Should detect double four", results);
 
     // テストケース4: 一直線上の四四のケース
     const char *testBoard4[] = {
@@ -604,19 +658,25 @@ void testIsMakingDoubleFour() {
     };
     
     initBoardWithStr(&board, testBoard4);
-    assert(isMakingDoubleFour(&board, 1, 5, PLAYER_X) == TRUE);
-    assert(isMakingDoubleFour(&board, 3, 5, PLAYER_X) == TRUE);
-    assert(isMakingDoubleFour(&board, 5, 6, PLAYER_X) == TRUE);
-    assert(isMakingDoubleFour(&board, 8, 6, PLAYER_X) == TRUE);
+    test_assert(isMakingDoubleFour(&board, 1, 5, PLAYER_X) == TRUE,
+                "Should detect double four", results);
+    test_assert(isMakingDoubleFour(&board, 3, 5, PLAYER_X) == TRUE,
+                "Should detect double four", results);
+    test_assert(isMakingDoubleFour(&board, 5, 6, PLAYER_X) == TRUE,
+                "Should detect double four", results);
+    test_assert(isMakingDoubleFour(&board, 8, 6, PLAYER_X) == TRUE,
+                "Should detect double four", results);
 
     // テストケース4: 白の手番
-    assert(isMakingDoubleFour(&board, 1, 1, PLAYER_O) == FALSE);
-    printf("All testIsMakingDoubleFour passed!\n");
+    test_assert(isMakingDoubleFour(&board, 1, 1, PLAYER_O) == FALSE,
+                "Should not detect double four", results);
+    test_end("IsMakingDoubleFour");
 }
 
-void testIsMakingGreatFour() {
+void testIsMakingGreatFour(TestResults* results) {
+    test_begin("IsMakingGreatFour");
+
     Board board;
-    printf("Start testIsMakingGreatFour...\n");
     
     // テストケース:
     // @は達四になるケース
@@ -636,15 +696,24 @@ void testIsMakingGreatFour() {
     };
     
     initBoardWithStr(&board, testBoard1);
-    assert(isMakingGreatFour(&board, 1, 2, PLAYER_X) == FALSE);
-    assert(isMakingGreatFour(&board, 1, 3, PLAYER_X) == TRUE);
-    assert(isMakingGreatFour(&board, 1, 7, PLAYER_X) == TRUE);
-    assert(isMakingGreatFour(&board, 1, 8, PLAYER_X) == FALSE);
-    assert(isMakingGreatFour(&board, 3, 3, PLAYER_X) == FALSE);
-    assert(isMakingGreatFour(&board, 3, 7, PLAYER_X) == TRUE);
-    assert(isMakingGreatFour(&board, 3, 8, PLAYER_X) == FALSE);
-    assert(isMakingGreatFour(&board, 8, 5, PLAYER_O) == TRUE);
-    assert(isMakingGreatFour(&board, 9, 4, PLAYER_O) == FALSE);
+    test_assert(isMakingGreatFour(&board, 1, 2, PLAYER_X) == FALSE,
+                "Should not detect great four", results);
+    test_assert(isMakingGreatFour(&board, 1, 3, PLAYER_X) == TRUE,
+                "Should detect great four", results);
+    test_assert(isMakingGreatFour(&board, 1, 7, PLAYER_X) == TRUE,
+                "Should detect great four", results);
+    test_assert(isMakingGreatFour(&board, 1, 8, PLAYER_X) == FALSE,
+                "Should not detect great four", results);
+    test_assert(isMakingGreatFour(&board, 3, 3, PLAYER_X) == FALSE,
+                "Should not detect great four", results);
+    test_assert(isMakingGreatFour(&board, 3, 7, PLAYER_X) == TRUE,
+                "Should detect great four", results);
+    test_assert(isMakingGreatFour(&board, 3, 8, PLAYER_X) == FALSE,
+                "Should not detect great four", results);
+    test_assert(isMakingGreatFour(&board, 8, 5, PLAYER_O) == TRUE,
+                "Should detect great four", results);
+    test_assert(isMakingGreatFour(&board, 9, 4, PLAYER_O) == FALSE,
+                "Should not detect great four", results);
 
     // テストケース2:
     const char *testBoard2[] = {
@@ -661,22 +730,32 @@ void testIsMakingGreatFour() {
     };
     
     initBoardWithStr(&board, testBoard2);
-    assert(isMakingGreatFour(&board, 2, 7, PLAYER_X) == FALSE);
-    assert(isMakingGreatFour(&board, 2, 8, PLAYER_X) == FALSE);
-    assert(isMakingGreatFour(&board, 3, 5, PLAYER_X) == FALSE);
-    assert(isMakingGreatFour(&board, 4, 2, PLAYER_X) == FALSE);
-    assert(isMakingGreatFour(&board, 4, 5, PLAYER_X) == TRUE);
-    assert(isMakingGreatFour(&board, 4, 7, PLAYER_X) == FALSE);
-    assert(isMakingGreatFour(&board, 5, 3, PLAYER_X) == FALSE);
-    assert(isMakingGreatFour(&board, 6, 1, PLAYER_X) == FALSE);
-    assert(isMakingGreatFour(&board, 6, 4, PLAYER_X) == FALSE);
-    printf("All testIsMakingGreatFour passed!\n");
+    test_assert(isMakingGreatFour(&board, 2, 7, PLAYER_X) == FALSE,
+                "Should not detect great four", results);
+    test_assert(isMakingGreatFour(&board, 2, 8, PLAYER_X) == FALSE,
+                "Should not detect great four", results);
+    test_assert(isMakingGreatFour(&board, 3, 5, PLAYER_X) == FALSE,
+                "Should not detect great four", results);
+    test_assert(isMakingGreatFour(&board, 4, 2, PLAYER_X) == FALSE,
+                "Should not detect great four", results);
+    test_assert(isMakingGreatFour(&board, 4, 5, PLAYER_X) == TRUE,
+                "Should detect great four", results);
+    test_assert(isMakingGreatFour(&board, 4, 7, PLAYER_X) == FALSE,
+                "Should not detect great four", results);
+    test_assert(isMakingGreatFour(&board, 5, 3, PLAYER_X) == FALSE,
+                "Should not detect great four", results);
+    test_assert(isMakingGreatFour(&board, 6, 1, PLAYER_X) == FALSE,
+                "Should not detect great four", results);
+    test_assert(isMakingGreatFour(&board, 6, 4, PLAYER_X) == FALSE,
+                "Should not detect great four", results);
+    test_end("IsMakingGreatFour");
 }
 
-void testIsThree() {
-    Board board;
-    printf("Start testIsThree...\n");
+void testIsThree(TestResults* results) {
+    test_begin("IsThree");
     
+    Board board;
+
     // テストケース:
     // Ref (https://tokai-renjukai.pya.jp/siryo/RenjuKiso/RenjuKiso-1-2.pdf)
     const char *testBoard1[] = {
@@ -722,10 +801,14 @@ void testIsThree() {
         .length = 3
     };
 
-    assert(isThree(&board, &line1, PLAYER_X) == TRUE);
-    assert(isThree(&board, &line2, PLAYER_X) == TRUE);
-    assert(isThree(&board, &line3, PLAYER_X) == TRUE);
-    assert(isThree(&board, &line4, PLAYER_O) == TRUE);
+    test_assert(isThree(&board, &line1, PLAYER_X) == TRUE,
+                "Should detect three", results);
+    test_assert(isThree(&board, &line2, PLAYER_X) == TRUE,
+                "Should detect three", results);
+    test_assert(isThree(&board, &line3, PLAYER_X) == TRUE,
+                "Should detect three", results);
+    test_assert(isThree(&board, &line4, PLAYER_O) == TRUE,
+                "Should detect three", results);
 
     const char *testBoard2[] = {
         NULL,
@@ -766,9 +849,12 @@ void testIsThree() {
         .length = 3
     };
 
-    assert(isThree(&board, &line5, PLAYER_X) == FALSE);
-    assert(isThree(&board, &line6, PLAYER_X) == FALSE);
-    assert(isThree(&board, &line7, PLAYER_X) == FALSE);
+    test_assert(isThree(&board, &line5, PLAYER_X) == FALSE,
+                "Should not detect three", results);
+    test_assert(isThree(&board, &line6, PLAYER_X) == FALSE,
+                "Should not detect three", results);
+    test_assert(isThree(&board, &line7, PLAYER_X) == FALSE,
+                "Should not detect three", results);
 
     const char *testBoard3[] = {
         NULL,
@@ -795,7 +881,8 @@ void testIsThree() {
         .hasGap = FALSE,
         .length = 3};
 
-    assert(isThree(&board, &line8, PLAYER_X) == FALSE);
+    test_assert(isThree(&board, &line8, PLAYER_X) == FALSE,
+                "Should not detect three", results);
 
     board.cells[3][5] = EMPTY_CELL;
     board.cells[5][6] = PLAYER_X;
@@ -807,13 +894,15 @@ void testIsThree() {
         .hasGap = TRUE,
         .length = 3};
 
-    assert(isThree(&board, &line9, PLAYER_X) == FALSE);
-    printf("All testIsThree passed!\n");
+    test_assert(isThree(&board, &line9, PLAYER_X) == FALSE,
+                "Should not detect three", results);
+    test_end("IsThree");
 }
 
-void testIsMakingDoubleThree() {
+void testIsMakingDoubleThree(TestResults* results) {
+    test_begin("IsMakingDoubleThree");
+
     Board board;
-    printf("Start testIsMakingDoubleThree...\n");
     
     // テストケース:
     // Ref (https://tokai-renjukai.pya.jp/siryo/RenjuKiso/RenjuKiso-1-2.pdf)
@@ -833,9 +922,12 @@ void testIsMakingDoubleThree() {
     // @は黒の三三、#は白の三三
     
     initBoardWithStr(&board, testBoard1);
-    assert(isMakingDoubleThree(&board, 3, 4, PLAYER_X) == TRUE);
-    assert(isMakingDoubleThree(&board, 5, 5, PLAYER_X) == TRUE);
-    assert(isMakingDoubleThree(&board, 6, 4, PLAYER_O) == TRUE);
+    test_assert(isMakingDoubleThree(&board, 3, 4, PLAYER_X) == TRUE,
+                "Should detect double three", results);
+    test_assert(isMakingDoubleThree(&board, 5, 5, PLAYER_X) == TRUE,
+                "Should detect double three", results);
+    test_assert(isMakingDoubleThree(&board, 6, 4, PLAYER_O) == TRUE,
+                "Should detect double three", results);
 
     const char *testBoard2[] = {
         NULL,
@@ -853,25 +945,34 @@ void testIsMakingDoubleThree() {
     // @は黒の三三、#は白の三三
     
     initBoardWithStr(&board, testBoard2);
-    assert(isMakingDoubleThree(&board, 4, 6, PLAYER_O) == TRUE);
-    assert(isMakingDoubleThree(&board, 5, 7, PLAYER_X) == TRUE);
+    test_assert(isMakingDoubleThree(&board, 4, 6, PLAYER_O) == TRUE,
+                "Should detect double three", results);
+    test_assert(isMakingDoubleThree(&board, 5, 7, PLAYER_X) == TRUE,
+                "Should detect double three", results);
 
-    printf("Start testIsMakingDoubleThree...\n");
+    test_end("IsMakingDoubleThree");
 }
 
 void runBoardTests() {
-    printf("Start runBoardTests...\n");
-    testInitBoard();
-    testIsWinMove();
-    testIsMakingOverLine();
-    testCountContinuousStonesWithGap();
-    testIsOpenLine();
-    testIsHalfOpenLine();
-    testGetGapIdx();
-    testIsFour();
-    testIsMakingDoubleFour();
-    testIsMakingGreatFour();
-    testIsThree();
-    testIsMakingDoubleThree();
-    printf("Finished runBoardTests.\n");
+    TestResults results = {0, 0, 0};
+    test_suite_begin("Board Tests");
+    
+    suppress_output();
+    
+    testInitBoard(&results);
+    testIsWinMove(&results);
+    testIsMakingOverLine(&results);
+    testCountContinuousStonesWithGap(&results);
+    testIsOpenLine(&results);
+    testIsHalfOpenLine(&results);
+    testGetGapIdx(&results);
+    testIsFour(&results);
+    testIsMakingDoubleFour(&results);
+    testIsMakingGreatFour(&results);
+    testIsThree(&results);
+    testIsMakingDoubleThree(&results);
+    
+    restore_output();
+    
+    test_suite_end("Board Tests", &results);
 }

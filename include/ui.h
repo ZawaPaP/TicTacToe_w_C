@@ -1,5 +1,5 @@
-#ifndef PLAYS_H
-#define PLAYS_H
+#ifndef UI_H
+#define UI_H
 #include "constants.h"
 #include "board.h"
 

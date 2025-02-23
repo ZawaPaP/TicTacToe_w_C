@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "plays.h"
+#include "ui.h"
 #include "board.h"
 
 void printBoard(Board *board) {

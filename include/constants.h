@@ -36,6 +36,14 @@ typedef enum
     FALSE = 0
 } BOOL;
 
+typedef enum {
+    GAME_PLAYING,
+    GAME_WIN,     
+    GAME_DRAW,   
+    GAME_FORBIDDEN_MOVE,
+    GAME_QUIT
+} GameState;
+
 typedef struct {
     char cells[BOARD_ROWS + 1][BOARD_COLUMNS + 1];
     int lastRow, lastCol;
@@ -46,12 +54,28 @@ typedef struct {
     int c;
 } Cell;
 
+typedef struct {
+    Cell move;
+    char player; // PLAYER_X or PLAYER_O
+} Move;
+
 typedef enum
 {
     PLAYER_PLAYER = 1,
     PLAYER_CPU = 2,
     CPU_CPU = 3
 } MODE;
+
+typedef struct {
+    Board board;
+    char currentPlayer;
+    GameState gameState;
+    char winner;
+    int moveCount;
+    Move moveHistory[BOARD_ROWS * BOARD_COLUMNS];
+    MODE gameMode;
+} Game;
+
 
 typedef enum
 {

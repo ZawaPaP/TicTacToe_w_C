@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "utils.h"
-#include "plays.h"
+#include "ui.h"
 #include "game.h"
 #include "cpu.h"
 
@@ -102,7 +102,6 @@ int __evaluateLengths(Board *board, int i, int j, int dx, int dy, char playerMar
         return score;
 
     if (length >= 5) {
-        printf("Found the Win move!!! %d %d\n", i, j);
         score += WIN_POINTS;
     }
     switch (length)

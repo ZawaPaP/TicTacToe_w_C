@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "plays.h"
+#include "ui.h"
 #include "board.h"
 #include "cpu.h"
 #include "queue.h"
@@ -8,6 +8,21 @@
 void playGame(int mode);
 char getWinner(Board *board);
 BOOL __isDrawGame(Board *board);
+
+void initGame(Game* game, MODE mode) {
+    initBoard(&game->board);
+    game->currentPlayer = PLAYER_X;
+    game->gameState = GAME_PLAYING;
+    game->winner = EMPTY_CELL;
+    game->moveCount = 0;
+    game->gameMode = mode;
+}
+
+void switchPlayer(Game* game) {
+    game->currentPlayer = (game->currentPlayer == PLAYER_X) ? PLAYER_O : PLAYER_X;
+}
+
+
 
 MODE selectGameMode() {
     MODE mode;
