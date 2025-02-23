@@ -415,7 +415,6 @@ BOOL isMakingDoubleThree(Board *board, int r, int c, char playerMark){
     return FALSE;
 }
 
-
 // 禁じ手かどうかの判定関数
 BOOL isProhibitedMove(Board *board, int r, int c, char playerMark) {
     if (playerMark != PLAYER_X)

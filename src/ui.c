@@ -28,18 +28,30 @@ static void createSeparator(char *separator) {
     strcat(separator, "-");
 }
 
-// セルの表示（最後の手は緑色で表示）
-static void printCell(char cell, BOOL isLastMove) {
-    if (isLastMove) {
-        printf("\x1b[32m%c\x1b[39m", cell);
-    } else {
-        printf("%c", cell);
-    }
+// セルの表示（最後の手は緑色で表示, 禁じ手は赤の*で表示）
+static void printCell(char cell, CellDisplayType displayType) {
+    switch(displayType) {
+        case LAST_MOVE:
+            printf("\x1b[32m%c\x1b[39m", cell);
+            break;
+        case PROHIBITED:
+            if (cell == EMPTY_CELL) {
+                    printf("\x1b[31m*\x1b[39m");
+                } else {
+                    printf("%c", cell);
+                }
+                break;
+        default:
+            printf("%c", cell);
+            break;
+        }
 }
 
 void printBoard(Game *game) {
     Board *board = &game->board;
     Move lastMove = game->moveHistory[game->moveCount - 1];
+
+    char nextPlayer = (game->currentPlayer == PLAYER_X) ? PLAYER_O : PLAYER_X;
 
     printColumnNumbers();
     
@@ -50,7 +62,15 @@ void printBoard(Game *game) {
         printf("%d\t", i);
         
         for (int j = 1; j < BOARD_COLUMNS; j++) {
-            printCell(board->cells[i][j], i == lastMove.move.r && j == lastMove.move.c);
+            CellDisplayType displayType = NORMAL;
+
+            if (i == lastMove.move.r && j == lastMove.move.c) {
+                displayType = LAST_MOVE;
+            } else if (board->cells[i][j] == EMPTY_CELL && 
+                      isProhibitedMove(board, i, j, nextPlayer)) {
+                displayType = PROHIBITED;
+            }
+            printCell(board->cells[i][j], displayType);
             printf(" | ");
         }
         

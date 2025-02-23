@@ -53,6 +53,12 @@ typedef struct {
     int c;
 } Cell;
 
+typedef enum {
+    NORMAL,
+    LAST_MOVE,
+    PROHIBITED
+} CellDisplayType;
+
 typedef struct {
     Cell move;
     char player; // PLAYER_X or PLAYER_O

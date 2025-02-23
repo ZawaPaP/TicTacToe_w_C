@@ -76,7 +76,6 @@ void updateGameState(Game *game, int row, int col){
     }
 }
 
-
 void playTurn(Game* game) {
     // 1ターンの処理
     int row, col;
