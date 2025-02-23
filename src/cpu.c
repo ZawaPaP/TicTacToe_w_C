@@ -11,24 +11,12 @@ int negaMax(Board *board, int depth, char playerMark, int *bestRow, int *bestCol
 
 void getCpuMove(Board *board, int *row, int *col, char playerMark) {
 
-    if (playerMark == PLAYER_O) {
-        int bestRow = -1;
-        int bestCol = -1;
-        negaMax(board, NEGA_MAX_DEPTH, playerMark, &bestRow, &bestCol, -9999999, 9999999);
-        *row = bestRow;
-        *col = bestCol;
-        return;
-    }
-
-    while(1) {
-        int randR = 1 + rand() % BOARD_ROWS;
-        int randC = 1 + rand() % BOARD_COLUMNS;
-        if (isValidMove(board, randR, randC, playerMark)) {
-            *row = randR;
-            *col = randC;
-            break;
-        }
-    }
+    int bestRow = -1;
+    int bestCol = -1;
+    negaMax(board, NEGA_MAX_DEPTH, playerMark, &bestRow, &bestCol, -9999999, 9999999);
+    *row = bestRow;
+    *col = bestCol;
+    return;
 }
 
 int negaMax(Board *board, int depth, char playerMark, int* bestRow, int* bestCol, int alpha, int beta) {
