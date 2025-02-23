@@ -9,7 +9,7 @@ int evaluate(Board *board, char playerMark);
 int negaMax(Board *board, int depth, char playerMark, int *bestRow, int *bestCol, int alpha, int beta);
 
 
-void getCpuMove(int *row, int *col, Board *board, char playerMark) {
+void getCpuMove(Board *board, int *row, int *col, char playerMark) {
 
     if (playerMark == PLAYER_O) {
         int bestRow = -1;
@@ -23,7 +23,7 @@ void getCpuMove(int *row, int *col, Board *board, char playerMark) {
     while(1) {
         int randR = 1 + rand() % BOARD_ROWS;
         int randC = 1 + rand() % BOARD_COLUMNS;
-        if (canApplyMove(randR, randC, board, playerMark)) {
+        if (isValidMove(board, randR, randC, playerMark)) {
             *row = randR;
             *col = randC;
             break;

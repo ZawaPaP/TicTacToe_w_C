@@ -5,10 +5,13 @@
 
 
 BOOL isValidMoveInput(int *x, int *y);
-BOOL canApplyMove(int row, int col, Board *board, char playerMark);
-BOOL isValidMove(int row, int col, Board *board, char playerMark);
-void printBoard(Board *board);
+BOOL handlePlayerInput(int *row, int *col);
+void displayThanksMessage(void);
+void printBoard(Game *game);
+void announceResult(const Game *game);
 void printGameStatus(int turnCounts, char player);
 void printWinner(char player);
 void printDrawGame();
+BOOL askForRematch(void);
+MODE selectGameMode();
 #endif

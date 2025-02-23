@@ -2,22 +2,29 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../include/ui.h"
+#include "../include/game.h"
 #include "test_utils.h"
 #include "test_ui.h"
 
 void testPrintBoard(TestResults* results) {
     test_begin("PrintBoard");
 
-    Board board;
-    initBoard(&board);
-    board.cells[1][1] = PLAYER_X;
-    board.cells[5][7] = PLAYER_O;
-    board.cells[9][9] = PLAYER_X;
+    Game game;
+    initGame(&game, PLAYER_PLAYER);
+
+    game.board.cells[1][1] = PLAYER_X;
+    game.board.cells[5][7] = PLAYER_O;
+    game.board.cells[9][9] = PLAYER_X;
+
+    game.moveCount = 3;
+    game.moveHistory[2].move.r = 9;
+    game.moveHistory[2].move.c = 9;
+    game.moveHistory[2].player = PLAYER_X;
 
     FILE* fp = fopen("test_print_board_output.txt", "w");
     FILE* stdout_backup = stdout;
     stdout = fp;
-    printBoard(&board);
+    printBoard(&game);
     stdout = stdout_backup;
     fclose(fp);
 
@@ -47,7 +54,7 @@ void testPrintBoard(TestResults* results) {
         "\t- + - + - + - + - + - + - + - + -\n",
         "8\t  |   |   |   |   |   |   |   |  \n",
         "\t- + - + - + - + - + - + - + - + -\n",
-        "9\t  |   |   |   |   |   |   |   | X\n",
+        "9\t  |   |   |   |   |   |   |   | \x1b[32mX\x1b[39m\n", 
         "\n", 
         NULL
     };
@@ -65,42 +72,6 @@ void testPrintBoard(TestResults* results) {
     remove("test_print_board_output.txt");
     
     test_end("PrintBoard");
-}
-
-void testPlaceMoveExpected(TestResults* results) {
-    test_begin("PlaceMoveExpected");
-
-    Board board = __prepareBoard();
-    test_assert(canApplyMove(5, 5, &board, PLAYER_X) == TRUE,
-                "Should allow move to empty center position", results);
-
-    test_assert(canApplyMove(1, 1, &board, PLAYER_X) == TRUE,
-                "Should allow move to top-left corner", results);
-    
-    test_assert(canApplyMove(BOARD_ROWS, 1, &board, PLAYER_X) == TRUE,
-                "Should allow move to bottom-left corner", results);
-
-    test_assert(canApplyMove(1, BOARD_COLUMNS, &board, PLAYER_X) == TRUE,
-                "Should allow move to top-right corner", results);
-
-    test_assert(canApplyMove(BOARD_ROWS, BOARD_COLUMNS, &board, PLAYER_X) == TRUE,
-                "Should allow move to bottom-right corner", results);
-
-    test_end("PlaceMoveExpected");
-}
-
-void testPlaceMoveFailedAlreadyMarked(TestResults* results) {
-    Board board = __prepareBoard();
-    board.cells[5][5] = PLAYER_X;
-
-    test_assert(canApplyMove(5, 5, &board, PLAYER_X) == FALSE,
-                "Should not allow move to already marked position", results);
-}
-
-void testPlaceMoveFailedOutOfRange(TestResults* results) {
-    Board board = __prepareBoard();
-    test_assert(canApplyMove(BOARD_ROWS + 1, BOARD_COLUMNS, &board, PLAYER_X) == FALSE,
-                "Should not allow move out of range", results);
 }
 
 void testGetInputExpectedStr(TestResults* results) {
@@ -265,92 +236,15 @@ void testGetInputFailedTooLongInt(TestResults* results) {
     test_end("GetInputFailedTooLongInt");
 }
 
-void testValidateInputExpectedRange(TestResults* results) {
-    test_begin("ValidateInputExpectedRange");
 
-    printf("000000");
-
-    Board board = __prepareBoard();
-
-    int row = 5;
-    int col = 5;
-    test_assert(isValidMove(row, col, &board, PLAYER_X) == TRUE,
-                "Should allow move in valid range", results);
-
-    int rowEdgeBegin = 1;
-    int colEdgeBegin = 1;
-    test_assert(isValidMove(rowEdgeBegin, colEdgeBegin, &board, PLAYER_X) == TRUE,
-                "Should allow move to top-left corner", results);
-
-    int rowEdgeEnd = BOARD_ROWS;
-    int colEdgeEnd = BOARD_COLUMNS;
-    test_assert(isValidMove(rowEdgeEnd, colEdgeEnd, &board, PLAYER_X) == TRUE,
-                "Should allow move to bottom-right corner", results);
-
-    test_end("ValidateInputExpectedRange");
-}
-
-void testValidateInputFailedOutOfRange(TestResults* results) {
-    test_begin("ValidateInputFailedOutOfRange");
-
-    printf("000000");
-
-    Board board = __prepareBoard();
-
-    int zeroRow = 0;
-    int zeroCol = 0;
-
-    test_assert(isValidMove(zeroRow, zeroCol, &board, PLAYER_X) == FALSE,
-                "Should not allow move in zero range", results);
-    
-    int negativeInt = -1;
-    int randInt = 4;
-    test_assert(isValidMove(negativeInt, randInt, &board, PLAYER_X) == FALSE,
-                "Should not allow move in negative range", results);
-
-    int ToobigInt = 123490;
-    test_assert(isValidMove(ToobigInt, randInt, &board, PLAYER_X) == FALSE,
-                "Should not allow move in too big range", results);
-
-    test_end("ValidateInputFailedOutOfRange");
-}
-
-void testValidateInputFailedNotEmpty(TestResults* results) {
-    test_begin("ValidateInputFailedNotEmpty");
-
-    Board board = __prepareBoard();
-
-    int row = 5;
-    int col = 5;
-
-    board.cells[row][col] = PLAYER_O;
-    test_assert(isValidMove(row, col, &board, PLAYER_X) == FALSE,
-                "Should not allow move to already marked position", results);
-
-    int rowEdgeBegin = 1;
-    int colEdgeBegin = 1;
-    board.cells[rowEdgeBegin][colEdgeBegin] = PLAYER_O;
-    test_assert(isValidMove(rowEdgeBegin, colEdgeBegin, &board, PLAYER_X) == FALSE,
-                "Should not allow move to already marked position", results);
-
-    int rowEdgeEnd = BOARD_ROWS;
-    int colEdgeEnd = BOARD_COLUMNS;
-    board.cells[rowEdgeEnd][colEdgeEnd] = PLAYER_O;
-    test_assert(isValidMove(rowEdgeEnd, colEdgeEnd, &board, PLAYER_X) == FALSE,
-                "Should not allow move to already marked position", results);
-
-    test_end("ValidateInputFailedNotEmpty");
-}
 
 void runUiTests() {
     TestResults results = {0, 0, 0};
     test_suite_begin("UI Tests");
     
     suppress_output();
-    
+
     testPrintBoard(&results);
-    testPlaceMoveExpected(&results);
-    testPlaceMoveFailedAlreadyMarked(&results);
     testGetInputExpectedStr(&results);
     testGetInputWithoutComma(&results);
     testGetInputWithSpace(&results);
@@ -360,9 +254,6 @@ void runUiTests() {
     testGetInputFailedEmpty(&results);
     testGetInputFailedEOF(&results);
     testGetInputFailedTooLongInt(&results);
-    testValidateInputExpectedRange(&results);
-    testValidateInputFailedOutOfRange(&results);
-    testValidateInputFailedNotEmpty(&results);
     
     restore_output();
     

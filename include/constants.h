@@ -40,7 +40,6 @@ typedef enum {
     GAME_PLAYING,
     GAME_WIN,     
     GAME_DRAW,   
-    GAME_FORBIDDEN_MOVE,
     GAME_QUIT
 } GameState;
 
@@ -105,5 +104,11 @@ typedef struct {
     LineInfo lines[2];  // 最大2パターンを格納
     int pattern; // 見つかったパターンの数（1または2）
 } LinePatterns;
+
+typedef struct {
+    int lengthScore;      // 連続した石の評価
+    int positionScore;    // 位置の価値評価
+    int patternScore;     // その他パターンの評価
+} EvaluationScores;
 
 #endif
