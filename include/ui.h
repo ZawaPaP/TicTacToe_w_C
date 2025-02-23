@@ -10,8 +10,6 @@ void displayThanksMessage(void);
 void printBoard(Game *game);
 void announceResult(const Game *game);
 void printGameStatus(int turnCounts, char player);
-void printWinner(char player);
-void printDrawGame();
 BOOL askForRematch(void);
 MODE selectGameMode();
 #endif

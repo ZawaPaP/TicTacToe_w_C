@@ -64,8 +64,6 @@ void applyMove(Game* game, int row, int col) {
     Move move = {.move.r = row, .move.c = col, .player = game->currentPlayer};
     game->moveHistory[game->moveCount] = move;
     game->moveCount++;
-
-    printf("%c placed at: %d, %d\n", game->currentPlayer, row, col);
 }
 
 void updateGameState(Game *game, int row, int col){
@@ -97,8 +95,8 @@ void playTurn(Game* game) {
     applyMove(game, row, col);
     updateGameState(game, row, col);
     printBoard(game);
+    announceResult(game);
 }
-
 
 void playGame(int mode)
 {

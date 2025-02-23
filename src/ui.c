@@ -73,16 +73,6 @@ void printGameStatus(int turnCounts, char player) {
     printf("Turn %d, %c's turn.\n",turnCounts, player);    
 }
 
-void printWinner(char player) {
-    printf("\t\tWinner is %c!\n\n", player);
-}
-
-void printDrawGame() {
-    printf("\tDrow. Nice game!\n\n");
-}
-
-
-
 void displayWelcomeMessage(void) {
     printf("Welcome to Renju (連珠)!\n");
     printf("================================\n\n");
@@ -161,16 +151,13 @@ void announceResult(const Game* game) {
     
     switch (game->gameState) {
         case GAME_PLAYING:
-            printf("Player %c placed at: %d, %d\n", game->currentPlayer, -1, -1);
+            printf("Player %c placed at: %d, %d\n", game->currentPlayer, game->moveHistory[game->moveCount - 1].move.r, game->moveHistory[game->moveCount - 1].move.c);
             break;
         case GAME_WIN:
             printf("Congratulations! Player %c wins!\n", game->winner);
             break;
         case GAME_DRAW:
             printf("The game ended in a draw!\n");
-            break;
-        case GAME_QUIT:
-            printf("Game quit by player.\n");
             break;
         default:
             printf("[Error] Unexpected game state!\n");
