@@ -9,21 +9,23 @@ void playGame(int mode);
 char getWinner(Board *board);
 BOOL __isDrawGame(Board *board);
 
-void initGame(Game* game, MODE mode) {
-    initBoard(&game->board);
-    game->currentPlayer = PLAYER_X;
-    game->gameState = GAME_PLAYING;
-    game->winner = EMPTY_CELL;
-    game->moveCount = 0;
-    game->gameMode = mode;
+Game initGame(MODE mode) {
+    Game game;
+    initBoard(&(game.board));
+    game.currentPlayer = PLAYER_X;
+    game.gameState = GAME_PLAYING;
+    game.winner = EMPTY_CELL;
+    game.moveCount = 0;
+    game.gameMode = mode;
+    return game;
 }
 
 void switchPlayer(Game* game) {
     game->currentPlayer = (game->currentPlayer == PLAYER_X) ? PLAYER_O : PLAYER_X;
 }
 
-BOOL isGameOver(Board *board, int *row, int *col, char player) {
-    return isWinMove(board, *row, *col, player) || boardIsFull(board);
+BOOL isGameOver(Board *board, int row, int col, char player) {
+    return isWinMove(board, row, col, player) || boardIsFull(board);
 }
 
 BOOL isValidMove(Board* board, int row, int col, char playerMark) {
@@ -44,30 +46,27 @@ BOOL isValidMove(Board* board, int row, int col, char playerMark) {
     return TRUE;
 }
 
-void handlePlayerMove(Game *game, int* row, int* col) {
-    while(TRUE) {
-        if (handlePlayerInput(row, col)) {
-            if (isValidMove(&game->board, *row, *col, game->currentPlayer)) {
-                return;
-            }
+Move getPlayerMove(Game *game) {
+    while (TRUE)
+    {
+        Move move = getPlayerInput();
+        printf("row %d, col %d", move.row, move.col);
+        if (isValidMove(&game->board, move.row, move.col, game->currentPlayer))
+        {
+            return move;
         }
     }
 }
 
-void handleCPUMove(Game* game, int* row, int* col) {
-    getCpuMove(&game->board, row, col, game->currentPlayer);
-    return;
-}
-
-void applyMove(Game* game, int row, int col) {
-    game->board.cells[row][col] = game->currentPlayer;
-    Move move = {.move.r = row, .move.c = col, .player = game->currentPlayer};
-    game->moveHistory[game->moveCount] = move;
+void applyMove(Game* game, Move move) {
+    game->board.cells[move.row][move.col] = game->currentPlayer;
+    Hand hand = {.move.row = move.row, .move.col = move.col, .player = game->currentPlayer};
+    game->handHistory[game->moveCount] = hand;
     game->moveCount++;
 }
 
-void updateGameState(Game *game, int row, int col){
-    if (isWinMove(&game->board, row, col, game->currentPlayer)) {
+void updateGameState(Game *game, Move move){
+    if (isWinMove(&game->board, move.row, move.col, game->currentPlayer)) {
         game->gameState = GAME_WIN;
         game->winner = game->currentPlayer;
     }
@@ -76,9 +75,9 @@ void updateGameState(Game *game, int row, int col){
     }
 }
 
+// 1ターンの処理
 void playTurn(Game* game) {
-    // 1ターンの処理
-    int row, col;
+    Move move;
     printGameStatus(game->moveCount + 1, game->currentPlayer);
 
     if (
@@ -86,13 +85,13 @@ void playTurn(Game* game) {
             game->gameMode == PLAYER_CPU &&
             game->currentPlayer == PLAYER_O) ||
         game->gameMode == CPU_CPU) {
-        handleCPUMove(game, &row, &col);
+        move = getCpuMove(game);
     } else {
-        handlePlayerMove(game, &row, &col);
+        move = getPlayerMove(game);
     }
 
-    applyMove(game, row, col);
-    updateGameState(game, row, col);
+    applyMove(game, move);
+    updateGameState(game, move);
     printBoard(game);
     announceResult(game);
 }
@@ -100,8 +99,7 @@ void playTurn(Game* game) {
 void playGame(int mode)
 {
 
-    Game game;
-    initGame(&game, mode);
+    Game game = initGame(mode);
 
     printf("\n\tRenju Game Started!\n\n");
     printBoard(&game);

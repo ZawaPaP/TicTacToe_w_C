@@ -49,7 +49,7 @@ static void printCell(char cell, CellDisplayType displayType) {
 
 void printBoard(Game *game) {
     Board *board = &game->board;
-    Move lastMove = game->moveHistory[game->moveCount - 1];
+    Hand lastHand = game->handHistory[game->moveCount - 1];
 
     char nextPlayer = (game->currentPlayer == PLAYER_X) ? PLAYER_O : PLAYER_X;
 
@@ -64,7 +64,7 @@ void printBoard(Game *game) {
         for (int j = 1; j < BOARD_COLUMNS; j++) {
             CellDisplayType displayType = NORMAL;
 
-            if (i == lastMove.move.r && j == lastMove.move.c) {
+            if (i == lastHand.move.row && j == lastHand.move.col) {
                 displayType = LAST_MOVE;
             } else if (board->cells[i][j] == EMPTY_CELL && 
                       isProhibitedMove(board, i, j, nextPlayer)) {
@@ -76,7 +76,7 @@ void printBoard(Game *game) {
         
         // 最後の列は特別処理（区切り文字なし）
         printCell(board->cells[i][BOARD_COLUMNS], 
-                 i == lastMove.move.r && BOARD_COLUMNS == lastMove.move.c);
+                 i == lastHand.move.row && BOARD_COLUMNS == lastHand.move.col);
         printf("\n");
 
         // セパレータの表示
@@ -112,36 +112,28 @@ void displayThanksMessage(void) {
     printf("================================\n");
 }
 
-BOOL isValidMoveInput(int *row, int *col){
+Move getPlayerInput() {
+    Move move = {0, 0};
     char input[8];
-    
-    if (fgets(input, sizeof(input), stdin) == NULL) {
-        return FALSE;
-    }
 
-    if (input[0] == 'q' || strcmp(input, "quit\n") == 0) {
-        printf("\tGame Ended.\n");
-        exit(0);
-    }
-
-    if (sscanf(input, " %d , %d ", row, col) != 2 && sscanf(input, " %d %d ", row, col) != 2) {
-        return FALSE;
-    }
-
-    return TRUE;
-}
-
-
-BOOL handlePlayerInput(int* row, int* col) {
-    while (TRUE) {
+    while (TRUE)
+    {
         printf("Please input row,col (or 'q' to quit): ");
         
-        if (!isValidMoveInput(row, col)) {
-            printf("Invalid input format. Please use 'row,col' (e.g., '5,5')\n");
+        if (fgets(input, sizeof(input), stdin) == NULL) {
+            continue;
+        }
+
+        if (input[0] == 'q' || strcmp(input, "quit\n") == 0) {
+            printf("\tGame Ended.\n");
+            exit(0);
+        }
+
+        if (sscanf(input, " %d , %d ", &move.row, &move.col) != 2 && sscanf(input, " %d %d ", &move.row, &move.col) != 2) {
             continue;
         }
         
-        return TRUE;
+        return move;
     }
 }
 
@@ -171,7 +163,7 @@ void announceResult(const Game* game) {
     
     switch (game->gameState) {
         case GAME_PLAYING:
-            printf("Player %c placed at: %d, %d\n", game->currentPlayer, game->moveHistory[game->moveCount - 1].move.r, game->moveHistory[game->moveCount - 1].move.c);
+            printf("Player %c placed at: %d, %d\n", game->currentPlayer, game->handHistory[game->moveCount - 1].move.row, game->handHistory[game->moveCount - 1].move.col);
             break;
         case GAME_WIN:
             printf("Congratulations! Player %c wins!\n", game->winner);

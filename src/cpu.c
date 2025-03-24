@@ -9,18 +9,15 @@ int evaluate(Board *board, char playerMark);
 int negaMax(Board *board, int depth, char playerMark, int *bestRow, int *bestCol, int alpha, int beta);
 
 
-void getCpuMove(Board *board, int *row, int *col, char playerMark) {
+Move getCpuMove(Game *game) {
+    Move move = {0, 0};
 
-    int bestRow = -1;
-    int bestCol = -1;
-    negaMax(board, NEGA_MAX_DEPTH, playerMark, &bestRow, &bestCol, -9999999, 9999999);
-    *row = bestRow;
-    *col = bestCol;
-    return;
+    negaMax(&game->board, NEGA_MAX_DEPTH, game->currentPlayer, &move.row, &move.col, -9999999, 9999999);
+    return move;
 }
 
 int negaMax(Board *board, int depth, char playerMark, int* bestRow, int* bestCol, int alpha, int beta) {
-    if (depth == 0 || isGameOver(board, bestRow, bestCol, playerMark)) {
+    if (depth == 0 || isGameOver(board, *bestRow, *bestCol, playerMark)) {
         return evaluate(board, playerMark);
     }
 

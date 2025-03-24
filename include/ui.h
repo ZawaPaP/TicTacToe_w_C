@@ -4,8 +4,7 @@
 #include "board.h"
 
 
-BOOL isValidMoveInput(int *x, int *y);
-BOOL handlePlayerInput(int *row, int *col);
+Move getPlayerInput();
 void displayThanksMessage(void);
 void printBoard(Game *game);
 void announceResult(const Game *game);

@@ -62,4 +62,9 @@ Position pop(Queue *q){
 
 void freeQueue(Queue *q) {
     free(q->positions);
+    q->positions = NULL;
+    q->head = 0;
+    q->tail = 0;
+    q->size = 0;
+    q->capacity = 0;
 }

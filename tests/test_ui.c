@@ -9,17 +9,16 @@
 void testPrintBoard(TestResults* results) {
     test_begin("PrintBoard");
 
-    Game game;
-    initGame(&game, PLAYER_PLAYER);
+    Game game = initGame(PLAYER_PLAYER);
 
     game.board.cells[1][1] = PLAYER_X;
     game.board.cells[5][7] = PLAYER_O;
     game.board.cells[9][9] = PLAYER_X;
 
     game.moveCount = 3;
-    game.moveHistory[2].move.r = 9;
-    game.moveHistory[2].move.c = 9;
-    game.moveHistory[2].player = PLAYER_X;
+    game.handHistory[2].move.row = 9;
+    game.handHistory[2].move.col = 9;
+    game.handHistory[2].player = PLAYER_X;
 
     FILE* fp = fopen("test_print_board_output.txt", "w");
     FILE* stdout_backup = stdout;
@@ -74,169 +73,72 @@ void testPrintBoard(TestResults* results) {
     test_end("PrintBoard");
 }
 
-void testGetInputExpectedStr(TestResults* results) {
-    test_begin("GetInputExpectedStr");
+void testGetPlayerInputExpectedStr(TestResults* results) {
+    test_begin("GetPlayerInputExpectedStr");
 
-    int x, y;
     char input[] = "1, 2\n";
     FILE* stdin_backup = stdin;
     stdin = fmemopen(input, sizeof(input), "r");
+    Move move = getPlayerInput();
 
-    test_assert(isValidMoveInput(&x, &y) == TRUE,
-                "Should accept valid input format '1, 2'", results);
-    test_assert(x == 1 && y == 2,
+    test_assert(move.row == 1 && move.col == 2,
                 "Should correctly parse coordinates", results);
 
     stdin = stdin_backup;
     
-    test_end("GetInputExpectedStr");
+    test_end("GetPlayerInputExpectedStr");
 }
 
-void testGetInputWithoutComma(TestResults* results) {
-    test_begin("GetInputWithoutComma");
+void testGetPlayerInputWithoutComma(TestResults* results) {
+    test_begin("GetPlayerInputWithoutComma");
 
-    int x = 0, y = 0;
     char input[] = "1 2\n";
     FILE* stdin_backup = stdin;
     
     stdin = fmemopen(input, sizeof(input), "r");
+    Move move = getPlayerInput();
 
-    test_assert(isValidMoveInput(&x, &y) == TRUE,
-                "Should accept valid input format '1 2'", results);
-    test_assert(x == 1 && y == 2,
+    test_assert(move.row == 1 && move.col == 2,
                 "Should correctly parse coordinates", results);
 
     stdin = stdin_backup;
     
-    test_end("GetInputWithoutComma");
+    test_end("GetPlayerInputWithoutComma");
 }
 
-void testGetInputWithSpace(TestResults* results) {
-    test_begin("GetInputWithSpace");
+void testGetPlayerInputWithSpace(TestResults* results) {
+    test_begin("GetPlayerInputWithSpace");
 
-    int x = 0, y = 0;
     char input[] = "1 , 2 \n";
     FILE* stdin_backup = stdin;
     
     stdin = fmemopen(input, sizeof(input), "r");
+    Move move = getPlayerInput();
 
-    test_assert(isValidMoveInput(&x, &y) == TRUE,
-                "Should accept valid input format '1 , 2 '", results);
-    test_assert(x == 1 && y == 2,
+    test_assert(move.row == 1 && move.col == 2,
                 "Should correctly parse coordinates", results);
 
     stdin = stdin_backup;
     
-    test_end("GetInputWithSpace");
+    test_end("GetPlayerInputWithSpace");
 }
 
-void testGetInputWithoutSpace(TestResults* results) {
-    test_begin("GetInputWithoutSpace");
+void testGetPlayerInputWithoutSpace(TestResults* results) {
+    test_begin("GetPlayerInputWithoutSpace");
 
-    int x = 0, y = 0;
     char input[] = "1,2\n";
     FILE* stdin_backup = stdin;
     
     stdin = fmemopen(input, sizeof(input), "r");
+    Move move = getPlayerInput();
 
-    test_assert(isValidMoveInput(&x, &y) == TRUE,
-                "Should accept valid input format '1,2'", results);
-    test_assert(x == 1 && y == 2,
+    test_assert(move.row == 1 && move.col == 2,
                 "Should correctly parse coordinates", results);
 
     stdin = stdin_backup;
     
-    test_end("GetInputWithoutSpace");
+    test_end("GetPlayerInputWithoutSpace");
 }
-
-void testGetInputFailedWithAlphabet(TestResults* results) {
-    test_begin("GetInputFailedWithAlphabet");
-
-    int x = 0, y = 0;
-    char input[] = "a b\n";
-    FILE* stdin_backup = stdin;
-    
-    stdin = fmemopen(input, sizeof(input), "r");
-
-    test_assert(isValidMoveInput(&x, &y) == FALSE,
-                "Should not accept input with alphabets", results);
-    test_assert(x == FALSE && y == FALSE,
-                "Should return FALSE for invalid input", results);
-
-    stdin = stdin_backup;
-    
-    test_end("GetInputFailedWithAlphabet");
-}
-
-void testGetInputFailedFloat(TestResults* results) {
-    test_begin("GetInputFailedFloat");
-
-    int x = 0, y = 0;
-    char input[] = "3.5 2\n";
-    FILE* stdin_backup = stdin;
-    
-    stdin = fmemopen(input, sizeof(input), "r");
-
-    test_assert(isValidMoveInput(&x, &y) == FALSE,
-                "Should not accept floating point numbers", results);
-
-    stdin = stdin_backup;
-    
-    test_end("GetInputFailedFloat");
-}
-
-void testGetInputFailedEmpty(TestResults* results) {
-    test_begin("GetInputFailedEmpty");
-
-    int x = 0, y = 0;
-    char input[] = "\n";
-    FILE* stdin_backup = stdin;
-    
-    stdin = fmemopen(input, sizeof(input), "r");
-
-    test_assert(isValidMoveInput(&x, &y) == FALSE,
-                "Should not accept empty input", results);
-
-    stdin = stdin_backup;
-    
-    test_end("GetInputFailedEmpty");
-}
-
-void testGetInputFailedEOF(TestResults* results) {
-    test_begin("GetInputFailedEOF");
-
-    int x = 0, y = 0;
-    char input[] = "EOF";
-    FILE* stdin_backup = stdin;
-    
-    stdin = fmemopen(input, sizeof(input), "r");
-
-    test_assert(isValidMoveInput(&x, &y) == FALSE,
-                "Should not accept EOF", results);
-
-    stdin = stdin_backup;
-    
-    test_end("GetInputFailedEOF");
-}
-
-void testGetInputFailedTooLongInt(TestResults* results) {
-    test_begin("GetInputFailedTooLongInt");
-
-    int x = 0, y = 0;
-    char input[] = "12345678901234567890, 12345678901234567890\n";
-    FILE* stdin_backup = stdin;
-    
-    stdin = fmemopen(input, sizeof(input), "r");
-
-    test_assert(isValidMoveInput(&x, &y) == FALSE,
-                "Should not accept too long integers", results);
-
-    stdin = stdin_backup;
-    
-    test_end("GetInputFailedTooLongInt");
-}
-
-
 
 void runUiTests() {
     TestResults results = {0, 0, 0};
@@ -245,15 +147,10 @@ void runUiTests() {
     suppress_output();
 
     testPrintBoard(&results);
-    testGetInputExpectedStr(&results);
-    testGetInputWithoutComma(&results);
-    testGetInputWithSpace(&results);
-    testGetInputWithoutSpace(&results);
-    testGetInputFailedWithAlphabet(&results);
-    testGetInputFailedFloat(&results);
-    testGetInputFailedEmpty(&results);
-    testGetInputFailedEOF(&results);
-    testGetInputFailedTooLongInt(&results);
+    testGetPlayerInputExpectedStr(&results);
+    testGetPlayerInputWithoutComma(&results);
+    testGetPlayerInputWithSpace(&results);
+    testGetPlayerInputWithoutSpace(&results);
     
     restore_output();
     

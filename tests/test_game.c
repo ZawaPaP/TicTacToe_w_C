@@ -10,15 +10,14 @@
 void testGameInitialization(TestResults* results) {
     test_begin("GameInitialization");
     
-    Game game;
-    initGame(&game, PLAYER_PLAYER);
+    Game game = initGame(PLAYER_PLAYER);
     
     test_assert(game.currentPlayer == PLAYER_X,
                 "Game should start with PLAYER_X", results);
     test_assert(game.gameState == GAME_PLAYING,
                 "Game should start in PLAYING state", results);
     test_assert(game.moveCount == 0,
-                "Move count should start at 0", results);
+                "Hand count should start at 0", results);
     test_assert(game.gameMode == PLAYER_PLAYER,
                 "Game mode should be the PLAYER_PLAYER", results);
                 
@@ -28,8 +27,7 @@ void testGameInitialization(TestResults* results) {
 void testPlayerSwitch(TestResults* results) {
     test_begin("PlayerSwitch");
     
-    Game game;
-    initGame(&game, PLAYER_PLAYER);
+    Game game = initGame(PLAYER_PLAYER);
     
     switchPlayer(&game);
     test_assert(game.currentPlayer == PLAYER_O,

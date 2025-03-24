@@ -60,9 +60,14 @@ typedef enum {
 } CellDisplayType;
 
 typedef struct {
-    Cell move;
-    char player; // PLAYER_X or PLAYER_O
+    int row;
+    int col;
 } Move;
+
+typedef struct {
+    Move move;
+    char player; // PLAYER_X or PLAYER_O
+} Hand;
 
 typedef enum
 {
@@ -77,7 +82,7 @@ typedef struct {
     GameState gameState;
     char winner;
     int moveCount;
-    Move moveHistory[BOARD_ROWS * BOARD_COLUMNS];
+    Hand handHistory[BOARD_ROWS * BOARD_COLUMNS];
     MODE gameMode;
 } Game;
 
